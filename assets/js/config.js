@@ -8,6 +8,6 @@
    back to the built-in static content, so nothing breaks.
    ============================================================ */
 window.SUPABASE_CONFIG = {
-  url: 'https://YOUR-PROJECT.supabase.co',
-  anonKey: 'YOUR-PUBLIC-ANON-KEY'
+  url: 'https://pvfzbgvhtlrapdujiert.supabase.co',
+  anonKey: 'sb_publishable_WUDxMmQem9_B4sFQsfaajA_IyUZILLY'   // publishable (safe in browser, RLS-protected)
 };
