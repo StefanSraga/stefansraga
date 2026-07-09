@@ -1,0 +1,11 @@
+# dependencies / build junk
+node_modules/
+.DS_Store
+Thumbs.db
+
+# local server / preview
+.vercel
+.claude/
+
+# scratch
+*.log

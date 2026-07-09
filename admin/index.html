@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administrace — Štefan Šraga</title>
+  <link rel="icon" type="image/png" href="../assets/img/942fb7_f440d18845994b398622711be15ec0db.png">
+  <link rel="stylesheet" href="../assets/css/fonts.css?v=14">
+  <link rel="stylesheet" href="admin.css?v=14">
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<section id="login" class="login">
+  <form id="login-form" class="login-card">
+    <img class="login-logo" src="../assets/img/942fb7_f440d18845994b398622711be15ec0db.png" alt="">
+    <h1>Administrace</h1>
+    <p class="login-sub">Přihlaste se pro správu obsahu webu.</p>
+    <label>E-mail
+      <input type="email" id="login-email" autocomplete="username" required>
+    </label>
+    <label>Heslo
+      <input type="password" id="login-pass" autocomplete="current-password" required>
+    </label>
+    <button type="submit" class="btn btn-primary" id="login-btn">Přihlásit se</button>
+    <p class="login-err" id="login-err" hidden></p>
+    <p class="login-note" id="login-note"></p>
+  </form>
+</section>
+
+<!-- ===== APP ===== -->
+<div id="app" class="app" hidden>
+  <header class="adm-header">
+    <div class="adm-brand">
+      <img src="../assets/img/942fb7_f440d18845994b398622711be15ec0db.png" alt="">
+      <span>Administrace</span>
+    </div>
+    <nav class="adm-tabs">
+      <button class="adm-tab active" data-tab="videos">Videa</button>
+      <button class="adm-tab" data-tab="posts">Blog</button>
+      <button class="adm-tab" data-tab="galleries">Galerie</button>
+    </nav>
+    <div class="adm-user">
+      <a href="../" target="_blank" class="adm-view">Zobrazit web ↗</a>
+      <span id="adm-email" class="adm-email"></span>
+      <button class="btn btn-ghost" id="logout-btn">Odhlásit</button>
+    </div>
+  </header>
+
+  <main class="adm-main">
+    <section class="adm-panel" data-panel="videos"></section>
+    <section class="adm-panel" data-panel="posts" hidden></section>
+    <section class="adm-panel" data-panel="galleries" hidden></section>
+  </main>
+</div>
+
+<!-- ===== EDIT DIALOG ===== -->
+<div id="dialog" class="dialog" hidden>
+  <div class="dialog-card">
+    <div class="dialog-head">
+      <h2 id="dialog-title">Upravit</h2>
+      <button class="dialog-close" id="dialog-close" aria-label="Zavřít">&times;</button>
+    </div>
+    <form id="dialog-form" class="dialog-body"></form>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-ghost" id="dialog-cancel">Zrušit</button>
+      <button type="button" class="btn btn-primary" id="dialog-save">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="../assets/js/vendor/supabase.js"></script>
+<script src="../assets/js/config.js?v=14"></script>
+<script src="admin.js?v=14"></script>
+</body>
+</html>

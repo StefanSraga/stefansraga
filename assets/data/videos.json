@@ -1,0 +1,184 @@
+{
+  "_readme": "Manage the Videos page here. Each entry: title, category (an id from \"categories\"), description, and \"video\" — the easiest way is to PASTE A YOUTUBE LINK (e.g. https://youtu.be/ID or https://www.youtube.com/watch?v=ID); the thumbnail and the player are then automatic, no poster needed. For a self-hosted clip set \"video\" to a path like \"assets/video/name.mp4\" and add a \"poster\" image (and \"orientation\":\"portrait\" for vertical clips). Leave \"video\" empty (\"\") for a \"Coming soon\" card. The page reads this file on load, so changes show on refresh — no rebuild.",
+  "categories": [
+    {
+      "id": "esport",
+      "label": "Esport"
+    },
+    {
+      "id": "sport",
+      "label": "Sport"
+    },
+    {
+      "id": "promo",
+      "label": "Promo"
+    },
+    {
+      "id": "product",
+      "label": "Product"
+    }
+  ],
+  "videos": [
+    {
+      "id": "iem-cologne-major-26",
+      "title": "IEM COLOGNE MAJOR 26",
+      "category": "esport",
+      "date": "2026",
+      "description": "Major returned to the Cathedral of Counter-Strike. The stories this tournament created will stay with fans for a very long time. NiKo finally lifted his first Major trophy with Falcons. Magixx delivered an unbelievable 1v4 clutch. m0NESY's performance reminded everyone why he's one of the best players in the world... and I could go on. The content from this event generated over 1 million organic impressions on my Instagram, where you can also find all of the photos and videos I shared throughout the tournament.",
+      "video": "assets/video/491946_ed08a9e242134ce6be6327cce400fe43.mp4",
+      "poster": "assets/img/poster/491946_ed08a9e242134ce6be6327cce400fe43.jpg",
+      "orientation": "portrait"
+    },
+    {
+      "id": "clash-of-the-stars-16",
+      "title": "Clash of the Stars 16",
+      "category": "sport",
+      "date": "2025",
+      "description": "Clash of the Stars 16 and Vašek's title fight. I'm incredibly happy about the collaboration we've built together. I filmed Vašek's entire journey throughout the tournament, and I had the first edit finished the very next day after the event. That video has already surpassed 97,000 views. Vašek won his fight and earned the championship belt—it looks absolutely incredible. Congratulations, my friend.",
+      "video": "assets/video/491946_38cbb1a761ff434393be653ede613d8b.mp4",
+      "poster": "assets/img/poster/491946_38cbb1a761ff434393be653ede613d8b.jpg",
+      "orientation": "portrait"
+    },
+    {
+      "id": "iem-krak-w-26",
+      "title": "IEM KRAKÓW 26",
+      "category": "esport",
+      "date": "2026",
+      "description": "The year 2026 marked another chapter for IEM. After many long years in Katowice, this legendary tournament is moving to Kraków. As I write this—I've still got goosebumps. A new chapter is here, and I'm incredibly grateful that I was able to be part of it. Thank you very much for the accreditation, and you can already check out the first video.",
+      "video": "assets/video/491946_59ca5df2ca994335963810a4df30b39d.mp4",
+      "poster": "assets/img/poster/491946_59ca5df2ca994335963810a4df30b39d.jpg",
+      "orientation": "portrait"
+    },
+    {
+      "id": "iem-katowice-hall-of-heroes",
+      "title": "IEM KATOWICE - Hall of Heroes",
+      "category": "esport",
+      "date": "2025",
+      "description": "In 2025, I went to IEM Katowice to capture the atmosphere of one of the biggest esports events in the world. Crowds cheering, lights flashing, pure focus and emotion in every match. An incredible experience full of energy, passion, and unforgettable moments.",
+      "video": "https://www.youtube.com/watch?v=-dhOdup2cMo"
+    },
+    {
+      "id": "starladder-major-2025-budapest",
+      "title": "STARLADDER MAJOR 2025 Budapest",
+      "category": "esport",
+      "date": "2025",
+      "description": "At the end of 2025, I still managed to attend one more event. Huge thanks to the Starladder organization for the accreditation. An atmosphere that gave me goosebumps. A spectacular run by FaZe and so many other moments I’ll remember for the rest of my life. Video coming soon.",
+      "video": "",
+      "poster": "assets/img/491946_0140edccc5f2419cad6cf620468af4b8.jpg"
+    },
+    {
+      "id": "clash-of-the-stars-baba-jaga-promo",
+      "title": "CLASH OF THE STARS Baba Jaga Promo",
+      "category": "sport",
+      "date": "2025",
+      "description": "After an agreement with Vašek (Baba Yaga), we decided that I would make a video for him from the Clash of the Stars 14 tournament. Take a look at a highlight video from the evening, where Vašek won his fight. Thank you, Vašek, for the opportunity — it was great, and I’m looking forward to further collaboration.",
+      "video": "assets/video/491946_5af9a881fb9242159f4ec99cbac0daea.mp4",
+      "poster": "assets/img/poster/491946_5af9a881fb9242159f4ec99cbac0daea.jpg",
+      "orientation": "portrait"
+    },
+    {
+      "id": "ramson-barber-promo-spot",
+      "title": "RAMSON BARBER promo spot",
+      "category": "promo",
+      "date": "2025",
+      "description": "This week I spent some time at our barbershop, capturing the vibe that makes it special. The sound of clippers, smell of fresh coffee, laughter, and good energy all around. More than a haircut — it’s a place where style, confidence, and stories come together.",
+      "video": "https://www.youtube.com/watch?v=nJ0PC8LIzBY"
+    },
+    {
+      "id": "speed-power-and-pure-passion",
+      "title": "Speed, power and pure passion",
+      "category": "sport",
+      "date": "2025",
+      "description": "This weekend I captured the intensity on ice — blades slicing through every corner, energy rising with each play. The crowd, the speed, the emotion… everything came together in one unforgettable match.",
+      "video": "https://www.youtube.com/watch?v=Ny3ixBGOGvc"
+    },
+    {
+      "id": "born-to-rule-the-game",
+      "title": "Born to Rule the Game",
+      "category": "promo",
+      "date": "2025",
+      "description": "Filming a promo spot with FK Teplice and Platinum Natural was pure teamwork and creativity. Players giving it their all, passion meeting precision — a perfect connection between sport and lifestyle.",
+      "video": "https://www.youtube.com/watch?v=faNMqMeDQJU"
+    },
+    {
+      "id": "where-every-paw-matters",
+      "title": "Where Every Paw Matters",
+      "category": "promo",
+      "date": "2025",
+      "description": "A weekend full of joy, wagging tails, and countless stories. Shooting at the biggest pet fair in the Czech Republic, we captured the energy, care, and love that connect people with their four-legged friends.",
+      "video": "https://www.youtube.com/watch?v=w1fNC0BB5nE"
+    },
+    {
+      "id": "hc-teplice-huskies",
+      "title": "HC Teplice Huskies",
+      "category": "sport",
+      "date": "2025",
+      "description": "Every stride on the ice told a story of effort, focus, and heart. I spent the day with the team, capturing moments where ambition meets unity — and every frame felt like pure magic.",
+      "video": "https://www.youtube.com/watch?v=U87QbqV7utk"
+    },
+    {
+      "id": "awaken-your-inner-hero",
+      "title": "Awaken Your Inner Hero",
+      "category": "promo",
+      "date": "2025",
+      "description": "Creating a promo spot for Chladné Zbraně was like stepping into another world. Strength, courage, and craft — every detail designed to awaken something powerful inside.",
+      "video": "https://www.youtube.com/watch?v=EdbCakDebd8"
+    },
+    {
+      "id": "chasing-glory-on-ice",
+      "title": "Chasing Glory on Ice",
+      "category": "sport",
+      "date": "2025",
+      "description": "Adrenaline, sweat, and heart — that’s what defines every match. I captured the spirit of competition, where strength and precision decide who remains standing when the final horn echoes.",
+      "video": "https://www.youtube.com/watch?v=C0gvJ_RZ91g"
+    },
+    {
+      "id": "stronghold-superhorse",
+      "title": "STRONGHOLD SUPERHORSE",
+      "category": "product",
+      "date": "2025",
+      "description": "Promo video for the STRONGBOLD H800 Superhorse (1 pair) — showcasing a heavy-duty telescopic sawhorse built from high-grade steel. With adjustable legs, anti-slip feet, and an impressive 1,180 kg load capacity, it’s made for professionals who need strength, stability, and portability in one.",
+      "video": "https://www.youtube.com/watch?v=4fWiDfy8pbA"
+    },
+    {
+      "id": "craftmaker-roller-x-stand",
+      "title": "CRAFTMAKER ROLLER X-Stand",
+      "category": "product",
+      "date": "2025",
+      "description": "This week I worked on a new product video for the CRAFTMAKER ROLLER X-Stand — a sleek, practical display solution for professionals. Clean lines, smooth motion, and precision in every shot. More than just a stand — it’s where craftsmanship meets perfect presentation.",
+      "video": "https://www.youtube.com/watch?v=8-vdxbzLN7U"
+    },
+    {
+      "id": "craftmaker-work-table-t200",
+      "title": "craftmaker work table T200",
+      "category": "product",
+      "date": "2025",
+      "description": "I created a promo video for the Craftmaker Work Table T200 — a folding, portable work table built for versatility and ease. Featuring a robust MDF top, a steel base with handy tool-holes, and a compact fold-flat design, it’s made to handle up to 100 kg and fits perfectly in a car trunk.",
+      "video": "https://www.youtube.com/watch?v=DIVrad6YN_k"
+    },
+    {
+      "id": "strongbold-s1",
+      "title": "STRONGBOLD S1",
+      "category": "product",
+      "date": "2025",
+      "description": "A promo video I produced for the Strongbold S1 Portable Clamping Station — highlighting its strength, flexibility, and smart design for every workspace.",
+      "video": "https://www.youtube.com/watch?v=EyyFuxZps90"
+    },
+    {
+      "id": "craftmaker-foldstation-s20",
+      "title": "craftmaker foldstation s20",
+      "category": "product",
+      "date": "2025",
+      "description": "A video project featuring the Craftmaker FoldStation S20 Adjustable Sawhorse and Worktop — showing how it seamlessly transforms from a sturdy sawhorse into a versatile worktable.",
+      "video": "https://www.youtube.com/watch?v=g0YFdihJJhE"
+    },
+    {
+      "id": "strongbold-superhorse-h800",
+      "title": "strongbold superhorse H800",
+      "category": "product",
+      "date": "2025",
+      "description": "Another video for the STRONGBOLD H800 Superhorse (1 pair) — featuring its next-generation telescopic design, high-grade steel construction, and impressive 1,180 kg load capacity.",
+      "video": "https://www.youtube.com/watch?v=Hjy3RObUdpg"
+    }
+  ]
+}
