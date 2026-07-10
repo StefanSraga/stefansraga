@@ -17,7 +17,7 @@
     fresh.forEach(g => {
       const reverse = side % 2 === 1; side++;
       const media = `<div class="media"><a href="/photos/${encodeURI(g.slug)}/"><img src="${esc(g.hero)}" alt="${esc(g.name)}" loading="lazy"></a></div>`;
-      const text = `<div class="text"><h2><a href="/photos/${encodeURI(g.slug)}/">${esc(g.name)}</a></h2><p>${esc(plain(g.intro).slice(0, 220))}</p></div>`;
+      const text = `<div class="text"><h2><a href="/photos/${encodeURI(g.slug)}/">${esc(g.name)}</a></h2><p>${esc(plain(g.intro).slice(0, 220))}</p><span class="cta">View gallery &rarr;</span></div>`;
       const card = document.createElement('div');
       card.className = 'card-row reveal visible' + (reverse ? ' reverse' : '');
       card.innerHTML = media + text;
