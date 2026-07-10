@@ -1033,13 +1033,22 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
   text-align: center;
 }
 
+/* The whole tile links to its section (Photography → photos/ …) */
+.service { position: relative; }
+.service h3 a { color: inherit; }
+.service h3 a::after { content: ''; position: absolute; inset: 0; }
+
+/* Icon videos have a black background. screen-blend hides it, but the reveal
+   animation's will-change isolates the tile's stacking context, which makes
+   the blend resolve against nothing — so paint the page colour underneath:
+   screen(black, #030303) = #030303 and the box disappears reliably. */
+.service .icon { background: var(--bg); }
 .service .icon img,
 .service .icon video {
   height: clamp(90px, 12vw, 150px);
   width: auto;
   margin: 0 auto 26px;
   display: inline-block;
-  /* icon videos have a black background — screen blend hides it on the dark page */
   mix-blend-mode: screen;
 }
 
