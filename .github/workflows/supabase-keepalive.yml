@@ -1,0 +1,26 @@
+# Supabase free projekty se po 7 dnech bez aktivity uspí (první návštěva pak
+# čeká ~60 s na probuzení). Tenhle cron se každé 3 dny dotkne databáze přes
+# veřejné API, takže projekt zůstává vzhůru. Klíč je "publishable" (veřejný,
+# chráněný RLS) — smí jen číst zveřejněný obsah.
+#
+# POZOR: GitHub vypíná plánované workflow po ~60 dnech bez aktivity v repu.
+# Když se na webu dlouho nic nemění, přijde e-mail od GitHubu — stačí workflow
+# jedním klikem znovu povolit (Actions → Supabase keep-alive → Enable).
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '23 6 */3 * *'   # každé 3 dny v 6:23 UTC
+  workflow_dispatch:          # + ruční spuštění v záložce Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (select 1 řádek přes REST)
+        run: |
+          curl -fsS 'https://pvfzbgvhtlrapdujiert.supabase.co/rest/v1/categories?select=id&limit=1' \
+            -H 'apikey: sb_publishable_WUDxMmQem9_B4sFQsfaajA_IyUZILLY' \
+            -H 'Authorization: Bearer sb_publishable_WUDxMmQem9_B4sFQsfaajA_IyUZILLY' \
+            -o /dev/null
+          echo "Supabase je vzhůru ✅"
