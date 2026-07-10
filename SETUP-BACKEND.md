@@ -154,10 +154,11 @@ je to šedá zóna, ne technický limit. Alternativa zdarma bez téhle nejasnost
 **Cloudflare Pages** nebo **Netlify** (obojí umí totéž pro statický web).
 
 **Pozn. 2 — Supabase se po 7 dnech nečinnosti „uspí":** free projekt se po týdnu bez
-aktivity pozastaví a první další načtení pak čeká ~60 s na probuzení. Vyřešíš to tím,
-že do DB občas „šťouchneš". Nejčistší je **GitHub Actions cron** (na free GitHubu
-zdarma), který pár× týdně pošle `select 1`. Alternativa: <https://cron-job.org> nebo
-UptimeRobot. Jakákoli aktivita 7denní časovač resetuje.
+aktivity pozastaví a první další načtení pak čeká ~60 s na probuzení. **Vyřešeno —
+v repu už je připravený GitHub Actions cron** ([.github/workflows/supabase-keepalive.yml](.github/workflows/supabase-keepalive.yml)),
+který každé 3 dny do DB „šťouchne" a drží ji vzhůru. Zdarma, nic nenastavuješ.
+Jediný háček: GitHub plánované akce vypne po ~60 dnech bez commitů — pošle ti
+e-mail a v záložce **Actions** je jedním klikem zase zapneš.
 
 **Dvě poctivá čísla:**
 - **Pragmaticky (jako osobní projekt):** **0 Kč/měsíc** (jen držet Supabase „při životě").

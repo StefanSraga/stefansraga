@@ -61,13 +61,44 @@
   }
 
   /* ---------- storage upload ---------- */
+  // Photos straight from a camera are huge — shrink to web size before upload
+  // (max 2560 px, JPEG). Saves the free-tier storage AND every visitor's data.
+  async function shrinkImage(file, maxEdge = 2560, quality = 0.85) {
+    if (!/^image\/(jpeg|webp)$/.test(file.type)) return file;   // PNG (alpha) left untouched
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(maxEdge / Math.max(bmp.width, bmp.height), 1);
+      if (scale === 1 && file.size < 900 * 1024) { bmp.close(); return file; }
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      bmp.close();
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', quality));
+      if (!blob || blob.size >= file.size) return file;
+      return new File([blob], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' });
+    } catch (e) { return file; }   // anything odd → upload the original
+  }
+
   async function uploadImage(file, folder) {
+    file = await shrinkImage(file);
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const rand = Math.random().toString(36).slice(2, 9);
     const key = `${folder}/${Date.now()}-${rand}.${ext}`;
     const { error } = await sb.storage.from('media').upload(key, file, { cacheControl: '3600', upsert: false });
     if (error) throw error;
     return sb.storage.from('media').getPublicUrl(key).data.publicUrl;
+  }
+
+  // When content is deleted, delete its files too — otherwise orphaned photos
+  // quietly eat the 1 GB storage. Only touches URLs inside our bucket.
+  function storageKey(url) {
+    const m = String(url || '').match(/\/storage\/v1\/object\/public\/media\/(.+)$/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  async function removeMedia(urls) {
+    const keys = [].concat(urls).map(storageKey).filter(Boolean);
+    if (keys.length) { try { await sb.storage.from('media').remove(keys); } catch (e) { console.warn(e); } }
   }
 
   /* ---------- dialog ---------- */
@@ -111,7 +142,13 @@
     const catBar = el('div', 'cats');
     catBar.appendChild(el('span', 'lbl', 'Kategorie:'));
     CATS.forEach(c => {
-      const chip = el('span', 'cat-chip', `${esc(c.label)} <button title="Smazat">&times;</button>`);
+      const chip = el('span', 'cat-chip', `<span class="nm" title="Klikni pro přejmenování">${esc(c.label)}</span> <button title="Smazat">&times;</button>`);
+      chip.querySelector('.nm').onclick = async () => {
+        const label = prompt('Nový název kategorie:', c.label);
+        if (!label || label === c.label) return;
+        await guardCall(sb.from('categories').update({ label }).eq('id', c.id), 'Kategorie přejmenována');
+        loadVideosPanel();
+      };
       chip.querySelector('button').onclick = async () => {
         if (!confirm(`Smazat kategorii „${c.label}"? Videa v ní zůstanou bez kategorie.`)) return;
         await guardCall(sb.from('categories').delete().eq('id', c.id), 'Kategorie smazána');
@@ -168,7 +205,7 @@
       guardCall(sb.from('videos').update({ published: e.target.checked }).eq('id', v.id), 'Uloženo');
     const [edit, del] = row.querySelectorAll('.r-actions .btn');
     edit.onclick = () => editVideo(v);
-    del.onclick = async () => { if (confirm(`Smazat video „${v.title}"?`)) { await guardCall(sb.from('videos').delete().eq('id', v.id), 'Smazáno'); loadVideosPanel(); } };
+    del.onclick = async () => { if (confirm(`Smazat video „${v.title}"?`)) { await guardCall(sb.from('videos').delete().eq('id', v.id), 'Smazáno'); removeMedia([v.poster]); loadVideosPanel(); } };
     return row;
   }
 
@@ -280,7 +317,7 @@
     row.querySelector('.pill-toggle input').onchange = e => guardCall(sb.from('posts').update({ published: e.target.checked }).eq('id', p.id), 'Uloženo');
     const [edit, del] = row.querySelectorAll('.r-actions button.btn');
     edit.onclick = () => editPost(p);
-    del.onclick = async () => { if (confirm(`Smazat článek „${p.title}"?`)) { await guardCall(sb.from('posts').delete().eq('id', p.id), 'Smazáno'); loadPostsPanel(); } };
+    del.onclick = async () => { if (confirm(`Smazat článek „${p.title}"?`)) { await guardCall(sb.from('posts').delete().eq('id', p.id), 'Smazáno'); removeMedia([p.cover]); loadPostsPanel(); } };
     return row;
   }
   function editPost(p) {
@@ -302,9 +339,16 @@
         </div>
       </div>
       <div class="field"><label>Perex (krátký popis)</label><textarea id="f-excerpt" style="min-height:60px">${esc(p.excerpt)}</textarea></div>
-      <div class="field"><label>Obsah článku (HTML)</label>
-        <textarea id="f-body" style="min-height:200px">${esc(p.body)}</textarea>
-        <span class="hint">Můžeš psát text i jednoduché HTML (&lt;p&gt;, &lt;h2&gt;, &lt;strong&gt;, &lt;img&gt; …).</span>
+      <div class="field"><label>Obsah článku</label>
+        <div class="ed-bar">
+          <button type="button" data-ed="h2">Nadpis</button>
+          <button type="button" data-ed="b">Tučně</button>
+          <button type="button" data-ed="green">Zeleně</button>
+          <button type="button" data-ed="img">+ Obrázek do textu</button>
+        </div>
+        <textarea id="f-body" style="min-height:220px">${esc(p.body)}</textarea>
+        <input type="file" id="f-body-img" accept="image/*" hidden>
+        <span class="hint">Piš normálně — odstavce se udělají samy z prázdných řádků. Označ text a klikni na tlačítko pro formát. (Kdo umí, může psát HTML přímo.)</span>
       </div>
       <div class="field-row">
         <div class="field"><label>Čas čtení</label><input type="text" id="f-read" value="${esc(p.read_time)}" placeholder="Minut čtení: 2"></div>
@@ -316,9 +360,14 @@
       if (file) { cover = await uploadImage(file, 'posts'); }
       const title = val('f-title');
       if (!title) { toast('Vyplň nadpis', true); throw new Error('no title'); }
+      // plain text (no HTML tags) → wrap blank-line paragraphs in <p> automatically
+      let body = document.getElementById('f-body').value.trim();
+      if (body && !/<[a-z][\s\S]*?>/i.test(body)) {
+        body = body.split(/\n\s*\n/).map(t => `<p>${t.trim().replace(/\n/g, '<br>')}</p>`).join('\n');
+      }
       const rec = {
         title, slug: await uniqueSlug('posts', val('f-slug') || title, p.slug),
-        cover, excerpt: val('f-excerpt'), body: val('f-body'),
+        cover, excerpt: val('f-excerpt'), body,
         date: val('f-date'), read_time: val('f-read'), published: checked('f-pub'),
       };
       if (isNew) {
@@ -330,10 +379,38 @@
       }
       loadPostsPanel();
     });
-    // live cover preview
+    // live cover preview + editor toolbar
     setTimeout(() => {
       const f = document.getElementById('f-cover-file');
       if (f) f.onchange = () => { if (f.files[0]) document.getElementById('f-cover-prev').src = URL.createObjectURL(f.files[0]); };
+
+      const ta = document.getElementById('f-body');
+      const wrap = (before, after) => {
+        const s = ta.selectionStart, e = ta.selectionEnd;
+        const sel = ta.value.slice(s, e) || 'text';
+        ta.setRangeText(before + sel + after, s, e, 'select');
+        ta.focus();
+      };
+      document.querySelectorAll('.ed-bar [data-ed]').forEach(btn => btn.onclick = () => {
+        const k = btn.getAttribute('data-ed');
+        if (k === 'h2') wrap('\n<h2>', '</h2>\n');
+        else if (k === 'b') wrap('<strong>', '</strong>');
+        else if (k === 'green') wrap('<span class="green">', '</span>');
+        else if (k === 'img') document.getElementById('f-body-img').click();
+      });
+      const bimg = document.getElementById('f-body-img');
+      if (bimg) bimg.onchange = async () => {
+        const file = bimg.files[0];
+        if (!file) return;
+        toast('Nahrávám obrázek…');
+        try {
+          const url = await uploadImage(file, 'posts');
+          const s = ta.selectionStart;
+          ta.setRangeText(`\n<img src="${url}" alt="">\n`, s, s, 'end');
+          toast('Obrázek vložen do textu');
+        } catch (e) { toast(e.message || 'Chyba nahrávání', true); }
+        bimg.value = '';
+      };
     }, 0);
   }
 
@@ -377,7 +454,13 @@
     row.querySelector('.pill-toggle input').onchange = e => guardCall(sb.from('galleries').update({ published: e.target.checked }).eq('id', g.id), 'Uloženo');
     const [edit, del] = row.querySelectorAll('.r-actions button.btn');
     edit.onclick = () => editGallery(g);
-    del.onclick = async () => { if (confirm(`Smazat galerii „${g.name}" i s fotkami?`)) { await guardCall(sb.from('galleries').delete().eq('id', g.id), 'Smazáno'); loadGalleriesPanel(); } };
+    del.onclick = async () => {
+      if (!confirm(`Smazat galerii „${g.name}" i s fotkami?`)) return;
+      const { data: ims } = await sb.from('gallery_images').select('url').eq('gallery_id', g.id);
+      await guardCall(sb.from('galleries').delete().eq('id', g.id), 'Smazáno');
+      removeMedia([...(ims || []).map(x => x.url), g.hero]);   // uklidit soubory z úložiště
+      loadGalleriesPanel();
+    };
     return row;
   }
   async function editGallery(g) {
@@ -432,7 +515,7 @@
           const cell = el('div', 'img-cell', `<img src="${esc(im.url)}" alt="">
             <button class="x" title="Smazat">&times;</button>
             <div class="mv"><button class="l" ${idx === 0 ? 'disabled' : ''}>◀</button><button class="r" ${idx === images.length - 1 ? 'disabled' : ''}>▶</button></div>`);
-          cell.querySelector('.x').onclick = async () => { await guardCall(sb.from('gallery_images').delete().eq('id', im.id), 'Fotka smazána'); images.splice(idx, 1); renderImgs(); };
+          cell.querySelector('.x').onclick = async () => { await guardCall(sb.from('gallery_images').delete().eq('id', im.id), 'Fotka smazána'); removeMedia([im.url]); images.splice(idx, 1); renderImgs(); };
           cell.querySelector('.mv .l').onclick = () => swapImg(idx, idx - 1);
           cell.querySelector('.mv .r').onclick = () => swapImg(idx, idx + 1);
           grid.appendChild(cell);
@@ -451,16 +534,22 @@
       const filesInput = document.getElementById('f-imgs-file');
       filesInput.onchange = async () => {
         const files = [...filesInput.files];
-        for (const f of files) {
+        if (!files.length) return;
+        filesInput.disabled = true;
+        let ok = 0;
+        for (let i = 0; i < files.length; i++) {
+          toast(`Nahrávám ${i + 1}/${files.length}…`);
           try {
-            const url = await uploadImage(f, 'galleries');
+            const url = await uploadImage(files[i], 'galleries');
             const sort = images.length;
             const { data } = await sb.from('gallery_images').insert({ gallery_id: g.id, url, alt: '', sort }).select();
-            if (data && data[0]) images.push(data[0]);
+            if (data && data[0]) { images.push(data[0]); ok++; }
+            renderImgs();   // photos appear as they land, not all at the end
           } catch (e) { toast(e.message, true); }
         }
-        toast('Fotky nahrány');
-        renderImgs();
+        filesInput.disabled = false;
+        filesInput.value = '';
+        toast(`Hotovo — nahráno ${ok} z ${files.length} fotek`);
       };
     }, 0);
   }

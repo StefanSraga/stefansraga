@@ -90,6 +90,22 @@ img { max-width: 100%; display: block; }
 .cat-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 5px 6px 5px 14px; font-size: 13.5px; }
 .cat-chip button { background: none; border: 0; color: var(--fg-dim); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 4px; }
 .cat-chip button:hover { color: var(--danger); }
+.cat-chip .nm { cursor: pointer; }
+.cat-chip .nm:hover { color: var(--accent); }
+
+/* mini editor toolbar (blog body) */
+.ed-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.ed-bar button {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 6px 12px;
+  background: var(--panel-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.ed-bar button:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- dialog ---------- */
 .dialog { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-start; justify-content: center; background: rgba(0,0,0,.66); padding: 5vh 16px; overflow-y: auto; }
