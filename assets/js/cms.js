@@ -32,9 +32,29 @@
     getPosts: () => rows(client.from('posts').select('*')
       .eq('published', true).order('sort')),
 
+    // No explicit published filter here on purpose: RLS hides drafts from
+    // anonymous visitors, but a logged-in admin (same browser as /admin)
+    // gets them back — that's the draft-preview feature.
     getPost: async (slug) => {
       const d = await rows(client.from('posts').select('*').eq('slug', slug).limit(1));
       return d[0] || null;
+    },
+
+    // +1 view for a published post (SECURITY DEFINER function; anon-safe).
+    // Fails silently when the function isn't installed yet.
+    bumpViews: (slug) => client.rpc('bump_views', { post_slug: slug })
+      .then(r => { if (r.error) console.warn('[views]', r.error.message); }),
+
+    // site settings as { key: value } — silently empty until the settings
+    // table exists (pre-migration databases must not spam the console)
+    getSettings: async () => {
+      try {
+        const { data, error } = await client.from('settings').select('*');
+        if (error) return {};
+        const map = {};
+        (data || []).forEach(r => { map[r.key] = r.value; });
+        return map;
+      } catch (e) { return {}; }
     },
 
     getGalleries: () => rows(client.from('galleries').select('*')

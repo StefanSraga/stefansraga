@@ -200,6 +200,7 @@
       const rndI = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
       const fmt = t => { t = clampT(Math.floor(t)); return [t / 3600, (t % 3600) / 60, t % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
       function tick() {
+        if (!el.isConnected) return;   // node was re-rendered away — stop this timer
         let d = rndI(-40, 60);
         if (Math.random() < 0.35) d += rndI(-60, 120);
         d = Math.max(-180, Math.min(180, d));

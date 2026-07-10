@@ -1,6 +1,7 @@
 /* Blog post — refresh the article from live data (existing pages) or render a
    brand-new post from its slug (dynamic /post/view/ route). Also injects the
-   "related frames" strip from the live post list. */
+   "related frames" strip, counts real views and shows a draft banner when a
+   logged-in admin previews an unpublished post. */
 (function () {
   if (!(window.SR && window.SR.ready && window.SRender)) return;
   const main = document.querySelector('main.page');
@@ -17,6 +18,15 @@
       return;
     }
     document.title = p.title;
+
+    // real view counting — once per browser session per article
+    const seenKey = 'viewed:' + slug;
+    if (p.published && !sessionStorage.getItem(seenKey)) {
+      sessionStorage.setItem(seenKey, '1');
+      p.views = (p.views || 0) + 1;            // show the count including this visit
+      window.SR.bumpViews(slug);
+    }
+
     let related = [];
     try {
       const all = await window.SR.getPosts();
@@ -28,6 +38,13 @@
     const html = window.SRender.postArticle(p, related);
     if (art) art.outerHTML = html;
     else main.insertAdjacentHTML('afterbegin', html);
+
+    // draft preview (only a logged-in admin can ever receive an unpublished post)
+    if (!p.published) {
+      main.insertAdjacentHTML('afterbegin',
+        '<div class="draft-banner mono">N&Aacute;HLED KONCEPTU &mdash; &#269;l&aacute;nek nen&iacute; zve&#345;ejn&#283;n&yacute;. Vid&iacute;&scaron; ho jen ty (p&#345;ihl&aacute;&scaron;en&yacute; admin).</div>');
+    }
+
     if (window.SRHud) window.SRHud(main);      // start timecode + view count-up on injected nodes
   }).catch(() => {});
 })();

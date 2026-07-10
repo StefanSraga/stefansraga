@@ -80,14 +80,16 @@
     } catch (e) { return file; }   // anything odd → upload the original
   }
 
-  async function uploadImage(file, folder) {
-    file = await shrinkImage(file);
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  async function uploadFile(file, folder) {
+    const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
     const rand = Math.random().toString(36).slice(2, 9);
     const key = `${folder}/${Date.now()}-${rand}.${ext}`;
     const { error } = await sb.storage.from('media').upload(key, file, { cacheControl: '3600', upsert: false });
     if (error) throw error;
     return sb.storage.from('media').getPublicUrl(key).data.publicUrl;
+  }
+  async function uploadImage(file, folder) {
+    return uploadFile(await shrinkImage(file), folder);
   }
 
   // When content is deleted, delete its files too — otherwise orphaned photos
@@ -307,7 +309,7 @@
       </div>
       <div class="r-actions">
         <label class="pill-toggle"><input type="checkbox" ${p.published ? 'checked' : ''}> zveřejněno</label>
-        <a class="btn btn-sm" href="/post/${encodeURI(p.slug)}/" target="_blank" rel="noopener">Otevřít ↗</a>
+        <a class="btn btn-sm" href="/post/${encodeURI(p.slug)}/" target="_blank" rel="noopener" title="${p.published ? '' : 'Koncept uvidíš jen ty (přihlášený admin)'}">${p.published ? 'Otevřít' : 'Náhled'} ↗</a>
         <button class="btn btn-sm">Upravit</button>
         <button class="btn btn-sm btn-danger">Smazat</button>
       </div>`;
@@ -322,7 +324,7 @@
   }
   function editPost(p) {
     const isNew = !p;
-    p = p || { title: '', slug: '', cover: '', excerpt: '', body: '', date: '', read_time: '', published: true };
+    p = p || { title: '', slug: '', cover: '', excerpt: '', body: '', date: '', read_time: '', tags: [], published: true };
     openDialog(isNew ? 'Nový článek' : 'Upravit článek', `
       <div class="field"><label>Nadpis</label><input type="text" id="f-title" value="${esc(p.title)}"></div>
       <div class="field-row">
@@ -339,6 +341,10 @@
         </div>
       </div>
       <div class="field"><label>Perex (krátký popis)</label><textarea id="f-excerpt" style="min-height:60px">${esc(p.excerpt)}</textarea></div>
+      <div class="field"><label>Štítky (odděl čárkou)</label>
+        <input type="text" id="f-tags" value="${esc((p.tags || []).join(', '))}" placeholder="esport, apple, recenze">
+        <span class="hint">Na blogu se z nich udělají filtrovací tlačítka a pomáhají vyhledávání.</span>
+      </div>
       <div class="field"><label>Obsah článku</label>
         <div class="ed-bar">
           <button type="button" data-ed="h2">Nadpis</button>
@@ -370,6 +376,12 @@
         cover, excerpt: val('f-excerpt'), body,
         date: val('f-date'), read_time: val('f-read'), published: checked('f-pub'),
       };
+      // tags column exists only after the 2026-07 schema update — send it only
+      // when it's actually used, so saving keeps working on older databases
+      const tagsRaw = val('f-tags');
+      if (tagsRaw || (p.tags && p.tags.length)) {
+        rec.tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+      }
       if (isNew) {
         const { data: mx } = await sb.from('posts').select('sort').order('sort', { ascending: false }).limit(1);
         rec.sort = ((mx && mx[0] && mx[0].sort) || 0) + 1;
@@ -554,6 +566,82 @@
     }, 0);
   }
 
+  /* ============================================================
+     WEB (site settings — homepage videos swappable without a deploy)
+     ============================================================ */
+  const HOME_SLOTS = [
+    { key: 'home_video_intro1', label: 'Úvodní video vlevo (první intro)' },
+    { key: 'home_video_intro2', label: 'Úvodní video vpravo (druhé intro)' },
+    { key: 'home_video_full', label: 'Velké video přes celou šířku' },
+  ];
+  async function loadWebPanel() {
+    const panel = $('[data-panel="web"]');
+    panel.innerHTML = '<p class="empty-hint">Načítám…</p>';
+    const { data, error } = await sb.from('settings').select('*');
+    if (error) {
+      panel.innerHTML = '<div class="empty-hint">Tabulka nastavení zatím neexistuje.<br>Spusť v Supabase → SQL Editor aktuální <code>supabase/schema.sql</code> (je bezpečné ho pustit znovu) a obnov tuhle stránku.</div>';
+      return;
+    }
+    const S = {};
+    (data || []).forEach(r => { S[r.key] = r.value || {}; });
+    panel.innerHTML = '';
+    const head = el('div', 'panel-head');
+    head.innerHTML = '<h2>Videa na hlavní stránce</h2><span class="spacer"></span>';
+    panel.appendChild(head);
+    const note = el('p', '', 'Nahraj MP4 a video na webu se vymění hned — bez programátora. Doporučení: zkomprimuj video na ~10–20 MB (1080p stačí), velké soubory žerou měsíční datový limit. „Poster" je obrázek zobrazený, než se video načte.');
+    note.style.cssText = 'margin:0 0 14px;font-size:12.5px;color:var(--fg-dim)';
+    panel.appendChild(note);
+    const list = el('div', 'rows');
+    HOME_SLOTS.forEach(slot => {
+      const cur = S[slot.key] || {};
+      const row = el('div', 'row');
+      row.innerHTML = `
+        <img class="thumb" src="${esc(cur.poster || '')}" alt="" onerror="this.style.opacity=.25">
+        <div class="grow">
+          <div class="r-title">${esc(slot.label)}</div>
+          <div class="r-sub">${cur.src ? esc(decodeURIComponent(cur.src.split('/').pop())) : '— původní video z webu —'}</div>
+        </div>
+        <div class="r-actions">
+          <label class="btn btn-sm">Nahrát MP4<input type="file" accept="video/mp4" hidden></label>
+          <label class="btn btn-sm">Poster<input type="file" accept="image/*" hidden></label>
+          ${cur.src ? '<button class="btn btn-sm btn-danger">Vrátit původní</button>' : ''}
+        </div>`;
+      const [vidIn, imgIn] = row.querySelectorAll('input[type=file]');
+      vidIn.onchange = async () => {
+        const f = vidIn.files[0];
+        if (!f) return;
+        if (f.size > 49 * 1024 * 1024) { toast('Video je moc velké (limit ~50 MB) — zkomprimuj ho', true); vidIn.value = ''; return; }
+        toast('Nahrávám video… může to chvíli trvat');
+        try {
+          const url = await uploadFile(f, 'home');
+          if (cur.src) removeMedia([cur.src]);   // předchozí nahrané video už není potřeba
+          await guardCall(sb.from('settings').upsert({ key: slot.key, value: { ...cur, src: url } }), 'Video vyměněno — je hned živě');
+          loadWebPanel();
+        } catch (e) { toast(e.message, true); }
+      };
+      imgIn.onchange = async () => {
+        const f = imgIn.files[0];
+        if (!f) return;
+        toast('Nahrávám poster…');
+        try {
+          const url = await uploadImage(f, 'home');
+          if (cur.poster) removeMedia([cur.poster]);
+          await guardCall(sb.from('settings').upsert({ key: slot.key, value: { ...cur, poster: url } }), 'Poster uložen');
+          loadWebPanel();
+        } catch (e) { toast(e.message, true); }
+      };
+      const resetBtn = row.querySelector('.btn-danger');
+      if (resetBtn) resetBtn.onclick = async () => {
+        if (!confirm('Vrátit původní video z webu?')) return;
+        await guardCall(sb.from('settings').delete().eq('key', slot.key), 'Vráceno původní video');
+        removeMedia([cur.src, cur.poster]);
+        loadWebPanel();
+      };
+      list.appendChild(row);
+    });
+    panel.appendChild(list);
+  }
+
   /* ---------- shared reorder ---------- */
   async function reorder(all, from, to, table) {
     if (to < 0 || to >= all.length) return;
@@ -570,7 +658,7 @@
   /* ============================================================
      TABS + AUTH
      ============================================================ */
-  const loaders = { videos: loadVideosPanel, posts: loadPostsPanel, galleries: loadGalleriesPanel };
+  const loaders = { videos: loadVideosPanel, posts: loadPostsPanel, galleries: loadGalleriesPanel, web: loadWebPanel };
   document.querySelectorAll('.adm-tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('.adm-tab').forEach(t => t.classList.toggle('active', t === tab));

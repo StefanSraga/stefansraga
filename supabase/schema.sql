@@ -69,6 +69,26 @@ create table if not exists public.galleries (
   updated_at   timestamptz not null default now()
 );
 
+-- article tags (filtering + search on the blog)
+alter table public.posts add column if not exists tags text[] not null default '{}';
+
+-- site settings (key/value; e.g. homepage videos swapped from the admin)
+create table if not exists public.settings (
+  key         text primary key,
+  value       jsonb not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
+-- real view counting: anonymous visitors may bump a published post's counter
+-- by exactly +1 via this function — they still have NO update rights on posts.
+create or replace function public.bump_views(post_slug text)
+returns void
+language sql security definer set search_path = public as $$
+  update public.posts set views = views + 1 where slug = post_slug and published;
+$$;
+revoke all on function public.bump_views(text) from public;
+grant execute on function public.bump_views(text) to anon, authenticated;
+
 -- images inside a gallery
 create table if not exists public.gallery_images (
   id           uuid primary key default gen_random_uuid(),
@@ -133,6 +153,14 @@ alter table public.videos         enable row level security;
 alter table public.posts          enable row level security;
 alter table public.galleries      enable row level security;
 alter table public.gallery_images enable row level security;
+alter table public.settings       enable row level security;
+
+-- settings: readable by everyone (homepage reads them), writable by admin
+drop policy if exists settings_read on public.settings;
+create policy settings_read on public.settings for select using (true);
+drop policy if exists settings_write on public.settings;
+create policy settings_write on public.settings for all
+  using (public.is_admin()) with check (public.is_admin());
 
 -- categories: readable by everyone, writable by admin
 drop policy if exists cat_read  on public.categories;

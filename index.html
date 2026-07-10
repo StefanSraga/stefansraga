@@ -6,8 +6,8 @@
   <title>Štefan Šraga – Photography, Video &amp; Creative Marketing, Gaming and Esport</title>
   <meta name="description" content="Marketing strategist. Photo & video creator. I'm Štefan Šraga — and I believe every detail tells a story worth sharing.">
   <link rel="icon" type="image/png" href="assets/img/942fb7_f440d18845994b398622711be15ec0db.png">
-  <link rel="stylesheet" href="assets/css/fonts.css?v=22">
-  <link rel="stylesheet" href="assets/css/style.css?v=22">
+  <link rel="stylesheet" href="assets/css/fonts.css?v=24">
+  <link rel="stylesheet" href="assets/css/style.css?v=24">
 </head>
 <body>
 
@@ -48,7 +48,7 @@
   <section class="intro-row reveal">
     <div class="intro-media">
       <div class="intro-topmeta"><span class="tc mono" data-timer>00:00:00</span> INTRO <span style="letter-spacing:.1em">&#8214; &#8857;</span></div>
-      <video data-autoplay muted loop playsinline preload="none"
+      <video data-autoplay data-home-video="intro1" muted loop playsinline preload="none"
              poster="assets/img/491946_59ca5df2ca994335963810a4df30b39df000.jpg"
              src="assets/video/491946_59ca5df2ca994335963810a4df30b39d.mp4"></video>
     </div>
@@ -69,7 +69,7 @@
   <section class="intro-row reverse reveal">
     <div class="intro-media">
       <div class="intro-topmeta"><span class="tc mono" data-timer>00:00:00</span> INTRO <span style="letter-spacing:.1em">&#8214; &#8857;</span></div>
-      <video data-autoplay muted loop playsinline preload="none"
+      <video data-autoplay data-home-video="intro2" muted loop playsinline preload="none"
              poster="assets/img/491946_38cbb1a761ff434393be653ede613d8bf000.jpg"
              src="assets/video/491946_38cbb1a761ff434393be653ede613d8b.mp4"></video>
     </div>
@@ -101,7 +101,7 @@
 
   <!-- ===== FULL-BLEED VIDEO ===== -->
   <section class="fullbleed">
-    <video data-autoplay muted loop playsinline preload="none"
+    <video data-autoplay data-home-video="full" muted loop playsinline preload="none"
            poster="assets/img/942fb7_995c2422db1d42a6a1450bf8594cebcaf000.jpg"
            src="assets/video/942fb7_995c2422db1d42a6a1450bf8594cebca.mp4"></video>
   </section>
@@ -192,6 +192,10 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js?v=22"></script>
+<script src="assets/js/vendor/supabase.js"></script>
+<script src="assets/js/config.js?v=24"></script>
+<script src="assets/js/cms.js?v=24"></script>
+<script src="assets/js/home.js?v=24"></script>
+<script src="assets/js/main.js?v=24"></script>
 </body>
 </html>
