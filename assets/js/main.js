@@ -185,24 +185,57 @@
   }
 
 
-  /* ---------- Random-walking timecode (intro top meta: "00:00:00 INTRO ‖ ○") ---------- */
-  document.querySelectorAll('[data-timer]').forEach(el => {
-    const MAX = 99 * 3600 + 59 * 60 + 59;
-    let s = 0;
-    const clampT = v => Math.max(0, Math.min(MAX, v));
-    const rndI = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-    const fmt = t => { t = clampT(Math.floor(t)); return [t / 3600, (t % 3600) / 60, t % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
-    function tick() {
-      let d = rndI(-40, 60);
-      if (Math.random() < 0.35) d += rndI(-60, 120);
-      d = Math.max(-180, Math.min(180, d));
-      s = clampT(s + d);
+  /* ---------- Camera HUD engines: timecodes + count-ups ----------
+     Exposed as window.SRHud(scope) and idempotent (data-hud guard), so the
+     live hydrators (blog.js / postpage.js) can re-run it on injected nodes. */
+  function initHud(scope) {
+    const root = scope || document;
+
+    // random-walking timecode ("00:00:00")
+    root.querySelectorAll('[data-timer]:not([data-hud])').forEach(el => {
+      el.setAttribute('data-hud', '1');
+      const MAX = 99 * 3600 + 59 * 60 + 59;
+      let s = 0;
+      const clampT = v => Math.max(0, Math.min(MAX, v));
+      const rndI = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+      const fmt = t => { t = clampT(Math.floor(t)); return [t / 3600, (t % 3600) / 60, t % 60].map(v => String(Math.floor(v)).padStart(2, '0')).join(':'); };
+      function tick() {
+        let d = rndI(-40, 60);
+        if (Math.random() < 0.35) d += rndI(-60, 120);
+        d = Math.max(-180, Math.min(180, d));
+        s = clampT(s + d);
+        el.textContent = fmt(s);
+        setTimeout(tick, rndI(600, 1200));
+      }
       el.textContent = fmt(s);
       setTimeout(tick, rndI(600, 1200));
+    });
+
+    // count up once on reveal (About vitals, blog view counts)
+    // The element's text is already the real value, so if this never fires
+    // (old browser, reduced motion) the visitor just sees the correct number.
+    const counters = [...root.querySelectorAll('[data-count]:not([data-hud])')];
+    if (counters.length && 'IntersectionObserver' in window &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const cio = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (!en.isIntersecting) return;
+          cio.unobserve(en.target);
+          const el = en.target;
+          const target = parseInt(el.getAttribute('data-count'), 10) || 0;
+          const t0 = performance.now(), dur = 900;
+          (function step(now) {
+            const p = Math.min(1, (now - t0) / dur);
+            el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+            if (p < 1) requestAnimationFrame(step);
+          })(t0);
+        });
+      }, { threshold: 0.5 });
+      counters.forEach(el => { el.setAttribute('data-hud', '1'); cio.observe(el); });
     }
-    el.textContent = fmt(s);
-    setTimeout(tick, rndI(600, 1200));
-  });
+  }
+  window.SRHud = initHud;
+  initHud(document);
 
   /* ---------- EXIF ticker (intro bottom bar) — cycling sets, green highlight sweep ---------- */
   const EXIF_SETS = [
@@ -312,27 +345,6 @@
     updateProgress();
     window.addEventListener('scroll', updateProgress, { passive: true });
     window.addEventListener('resize', updateProgress);
-  }
-
-  /* ---------- About vitals: count up once on reveal ---------- */
-  const counters = document.querySelectorAll('[data-count]');
-  if (counters.length && 'IntersectionObserver' in window &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const cio = new IntersectionObserver(entries => {
-      entries.forEach(en => {
-        if (!en.isIntersecting) return;
-        cio.unobserve(en.target);
-        const el = en.target;
-        const target = parseInt(el.getAttribute('data-count'), 10) || 0;
-        const t0 = performance.now(), dur = 900;
-        (function step(now) {
-          const p = Math.min(1, (now - t0) / dur);
-          el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
-          if (p < 1) requestAnimationFrame(step);
-        })(t0);
-      });
-    }, { threshold: 0.5 });
-    counters.forEach(el => cio.observe(el));
   }
 
   /* ---------- Collab carousel (VlaďkySyn) ---------- */

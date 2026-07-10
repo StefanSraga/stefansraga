@@ -251,6 +251,9 @@
     addBtn.onclick = () => editPost(null);
     head.appendChild(addBtn);
     panel.appendChild(head);
+    const note = el('p', '', '★ První článek v pořadí = velký FEATURED snímek nahoře na blogu. Pořadí měníš šipkami ▲▼.');
+    note.style.cssText = 'margin:0 0 14px;font-size:12.5px;color:var(--fg-dim,#9a9a9a)';
+    panel.appendChild(note);
     const list = el('div', 'rows');
     (posts || []).forEach((p, i) => list.appendChild(postRow(p, i, posts)));
     if (!(posts || []).length) list.appendChild(el('div', 'empty-hint', 'Zatím žádné články.'));
