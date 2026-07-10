@@ -365,19 +365,6 @@
     });
   });
 
-  /* ---------- Marketing arrows: arm animation when grid becomes visible ---------- */
-  const mkGrid = document.querySelector('.mk-grid');
-  if (mkGrid && 'IntersectionObserver' in window) {
-    const mio = new IntersectionObserver(entries => {
-      entries.forEach(en => {
-        if (en.isIntersecting) { mkGrid.classList.add('armed'); mio.disconnect(); }
-      });
-    }, { threshold: 0.2 });
-    mio.observe(mkGrid);
-  } else if (mkGrid) {
-    mkGrid.classList.add('armed');
-  }
-
   /* ---------- Lazy video autoplay (play when visible) ----------
      Also a bandwidth guard: force preload="none" so a heavy clip is only
      downloaded once the viewer actually scrolls near it (not on page load).
