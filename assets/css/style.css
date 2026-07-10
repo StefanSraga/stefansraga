@@ -1528,24 +1528,16 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
 
 /* --- four service rows --- */
 .mkh-console { max-width: 1360px; margin: 0 auto; padding: clamp(36px, 5vh, 64px) 4vw 0; }
-.mkh-channels { list-style: none; margin: 0; padding: 0; counter-reset: ch; }
+.mkh-channels { list-style: none; margin: 0; padding: 0; }
 .mkh-ch {
-  counter-increment: ch;
   display: grid;
-  grid-template-columns: 84px minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   gap: clamp(18px, 2.6vw, 44px);
   align-items: start;
   padding-block: clamp(30px, 4.5vw, 56px);
   border-top: 1px solid rgba(255,255,255,0.12);
 }
 .mkh-ch:last-child { border-bottom: 1px solid rgba(255,255,255,0.12); }
-.mkh-ch-idx { padding-top: 10px; }
-.mkh-ch-idx::before {
-  content: '//' counter(ch, decimal-leading-zero);
-  font-weight: 700; font-size: 13px; line-height: 1;
-  letter-spacing: 0.16em;
-  color: var(--accent);
-}
 .mkh-ch-name {
   margin: 0;
   font-family: var(--font-display);
@@ -1621,7 +1613,6 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
 
 @media (max-width: 900px) {
   .mkh-ch { grid-template-columns: 1fr; gap: 0; }
-  .mkh-ch-idx { padding: 0 0 8px; }
   .mkh-ch-text { margin-top: 14px; }
 }
 @media (max-width: 560px) {
