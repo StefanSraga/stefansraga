@@ -279,52 +279,88 @@
     cycle();
   });
 
-  /* ---------- Lightbox for photo grids ---------- */
-  const grids = document.querySelectorAll('.photo-grid');
-  if (grids.length) {
-    const lb = document.createElement('div');
-    lb.className = 'lightbox';
-    lb.innerHTML = '<button class="lb-close" aria-label="Close">&times;</button>' +
-      '<button class="lb-prev" aria-label="Previous">&#8249;</button>' +
-      '<img alt="">' +
-      '<button class="lb-next" aria-label="Next">&#8250;</button>';
-    document.body.appendChild(lb);
-    const lbImg = lb.querySelector('img');
-    let items = [], idx = 0;
-
-    function open(list, i) {
-      items = list; idx = i;
-      lbImg.src = items[idx].href;
-      lbImg.alt = items[idx].querySelector('img') ? items[idx].querySelector('img').alt : '';
-      lb.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-    function close() {
-      lb.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-    function show(delta) {
-      idx = (idx + delta + items.length) % items.length;
-      lbImg.src = items[idx].href;
+  /* ---------- Lightbox for photo grids ----------
+     Exposed as window.SRLightbox(scope) and idempotent, so gallery.js can
+     re-bind after live hydration replaces the grid. */
+  let lb = null, lbImg = null, lbItems = [], lbIdx = 0;
+  function lbOpen(list, i) {
+    lbItems = list; lbIdx = i;
+    lbImg.src = lbItems[lbIdx].href;
+    const im = lbItems[lbIdx].querySelector('img');
+    lbImg.alt = im ? im.alt : '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function lbClose() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  function lbShow(delta) {
+    lbIdx = (lbIdx + delta + lbItems.length) % lbItems.length;
+    lbImg.src = lbItems[lbIdx].href;
+  }
+  function initLightbox(scope) {
+    const grids = (scope || document).querySelectorAll('.photo-grid, .photo-grid-lb');
+    if (!grids.length) return;
+    if (!lb) {
+      lb = document.createElement('div');
+      lb.className = 'lightbox';
+      lb.innerHTML = '<button class="lb-close" aria-label="Close">&times;</button>' +
+        '<button class="lb-prev" aria-label="Previous">&#8249;</button>' +
+        '<img alt="">' +
+        '<button class="lb-next" aria-label="Next">&#8250;</button>';
+      document.body.appendChild(lb);
+      lbImg = lb.querySelector('img');
+      lb.querySelector('.lb-close').addEventListener('click', lbClose);
+      lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); lbShow(-1); });
+      lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); lbShow(1); });
+      lb.addEventListener('click', e => { if (e.target === lb || e.target === lbImg) lbClose(); });
+      document.addEventListener('keydown', e => {
+        if (!lb.classList.contains('open')) return;
+        if (e.key === 'Escape') lbClose();
+        if (e.key === 'ArrowLeft') lbShow(-1);
+        if (e.key === 'ArrowRight') lbShow(1);
+      });
     }
     grids.forEach(grid => {
+      if (grid.hasAttribute('data-lb')) return;
+      grid.setAttribute('data-lb', '1');
       const links = [...grid.querySelectorAll('a')];
       links.forEach((a, i) => a.addEventListener('click', e => {
         e.preventDefault();
-        open(links, i);
+        lbOpen(links, i);
       }));
     });
-    lb.querySelector('.lb-close').addEventListener('click', close);
-    lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); show(-1); });
-    lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); show(1); });
-    lb.addEventListener('click', e => { if (e.target === lb || e.target === lbImg) close(); });
-    document.addEventListener('keydown', e => {
-      if (!lb.classList.contains('open')) return;
-      if (e.key === 'Escape') close();
-      if (e.key === 'ArrowLeft') show(-1);
-      if (e.key === 'ArrowRight') show(1);
+  }
+  window.SRLightbox = initLightbox;
+  initLightbox(document);
+
+  /* ---------- Gallery tiles: orientation-aware spans ----------
+     Measures each photo once loaded and sizes its tile to match: portrait
+     gets a tall tile (.t), panorama a wide one (.w), and an occasional
+     landscape a 2×2 feature (.b). Needs no data — works the same for
+     admin-uploaded photos. Exposed as window.SRTiles(scope) for hydrators. */
+  function initTiles(scope) {
+    (scope || document).querySelectorAll('.masonry').forEach(grid => {
+      [...grid.querySelectorAll('a')].forEach((a, i) => {
+        if (a.hasAttribute('data-tile')) return;
+        a.setAttribute('data-tile', '1');
+        const img = a.querySelector('img');
+        if (!img) return;
+        const place = () => {
+          if (!img.naturalWidth || !img.naturalHeight) return;
+          const ar = img.naturalWidth / img.naturalHeight;
+          if (ar < 0.85) a.classList.add('t');
+          else if (ar > 1.9) a.classList.add('w');
+          else if (ar > 1.15 && i % 7 === 3) a.classList.add('b');
+        };
+        if (img.complete && img.naturalWidth) place();
+        else img.addEventListener('load', place, { once: true });
+      });
     });
   }
+  window.SRTiles = initTiles;
+  initTiles(document);
 
   /* ---------- About timeline: green line fills with scroll ----------
      getBoundingClientRect() returns VISUAL (zoomed) px, but style.height is

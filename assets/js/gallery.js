@@ -21,5 +21,7 @@
     }
     document.title = g.name + ' | Štefan Šraga';
     main.innerHTML = window.SRender.galleryBody(g);
+    if (window.SRTiles) window.SRTiles(main);        // orientation-aware tile spans
+    if (window.SRLightbox) window.SRLightbox(main);  // re-bind click-to-zoom
   }).catch(() => {});
 })();
