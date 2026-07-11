@@ -110,8 +110,7 @@ a { color: inherit; text-decoration: none; }
 .sragi-link { display: inline-flex; align-items: center; }
 .sragi-link img {
   height: 19px; width: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.9;
+  opacity: 0.9;                 /* logo je už v naší zelené (sragi_logo_green.png) */
   transition: opacity .2s ease;
 }
 .sragi-link:hover img { opacity: 1; }
@@ -1718,9 +1717,7 @@ article .prose img.tall {
 }
 .tlx-media.logo img {
   width: min(72%, 320px);
-  height: auto;
-  filter: brightness(0) invert(1);
-  opacity: 0.92;
+  height: auto;                 /* zelená verze — černá přebarvená na accent, bílá karta zůstává */
 }
 
 /* --- even stops swap sides --- */
