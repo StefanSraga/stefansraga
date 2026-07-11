@@ -394,21 +394,6 @@
           else n.classList.remove('counting');
         })();
       });
-      const cap = it.querySelector('.tlx-cap');
-      const ghost = it.querySelector('.tlx-cap-ghost');
-      const typed = it.querySelector('.tlx-cap-type');
-      if (cap && ghost && typed) {
-        const txt = ghost.textContent;
-        let i = 0;
-        cap.classList.add('typewrite');
-        typed.classList.add('typing');
-        (function type() {
-          i++;
-          typed.textContent = txt.slice(0, i);
-          if (i < txt.length) setTimeout(type, 13);
-          else setTimeout(() => typed.classList.remove('typing'), 1100);
-        })();
-      }
     }
 
     function updateLine() {

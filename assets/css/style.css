@@ -1638,17 +1638,6 @@ article .prose img.tall {
   max-width: 44ch;
 }
 .tlx-info .tlx-cap { margin-left: auto; }
-/* typewriter: the ghost keeps the layout, the visible layer types itself in
-   (engine adds .typewrite and fills .tlx-cap-type; no JS = plain caption) */
-.tlx-cap-type { position: absolute; inset: 0; display: none; }
-.tlx-cap.typewrite .tlx-cap-ghost { visibility: hidden; }
-.tlx-cap.typewrite .tlx-cap-type { display: block; }
-.tlx-cap-type.typing::after {
-  content: '\258D';
-  color: var(--accent);
-  animation: tlx-caret 0.8s steps(1) infinite;
-}
-@keyframes tlx-caret { 50% { opacity: 0; } }
 
 /* --- photo (odd: right of the line) --- */
 .tlx-media {
