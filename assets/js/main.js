@@ -301,7 +301,7 @@
     lbImg.src = lbItems[lbIdx].href;
   }
   function initLightbox(scope) {
-    const grids = (scope || document).querySelectorAll('.photo-grid, .photo-grid-lb');
+    const grids = (scope || document).querySelectorAll('.photo-grid, .photo-grid-lb, [data-lightbox]');
     if (!grids.length) return;
     if (!lb) {
       lb = document.createElement('div');
@@ -372,8 +372,19 @@
   if (tlx) {
     const fill = tlx.querySelector('.tlx-fill');
     const stops = [...tlx.querySelectorAll('.tlx-item')];
+    const navDots = [...tlx.querySelectorAll('.tlx-nav-dot')];
     const z = () => parseFloat(document.body.style.zoom) || 1;
     const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // thin scroll-progress bar pinned to the top of the story page
+    const prog = document.createElement('i');
+    prog.className = 'scroll-prog';
+    document.body.appendChild(prog);
+    function updateProg() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.max(0, Math.min(1, window.pageYOffset / max)) : 0;
+      prog.style.width = (p * 100) + '%';
+    }
 
     // stop ignition: year digits roll up + the caption types itself in
     function ignite(it) {
@@ -416,10 +427,24 @@
       }
       // radar ping only on the stop the tip is currently visiting
       for (const it of stops) it.classList.toggle('near', it === best && bestT > 0.55);
+      // side-nav marker tracks the stop the tip is closest to
+      if (navDots.length && best) {
+        const bi = stops.indexOf(best);
+        navDots.forEach((d, i) => d.classList.toggle('active', i === bi));
+      }
     }
-    updateLine();
-    window.addEventListener('scroll', updateLine, { passive: true });
-    window.addEventListener('resize', updateLine);
+    // smooth-scroll for the side jump-nav (falls back to native anchor jump)
+    navDots.forEach(d => d.addEventListener('click', e => {
+      const id = d.getAttribute('href');
+      const target = id && document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      target.scrollIntoView({ behavior: noMotion ? 'auto' : 'smooth', block: 'center' });
+    }));
+    function frame() { updateLine(); updateProg(); }
+    frame();
+    window.addEventListener('scroll', frame, { passive: true });
+    window.addEventListener('resize', frame);
   }
 
   /* ---------- Collab carousel (VlaďkySyn) ---------- */
