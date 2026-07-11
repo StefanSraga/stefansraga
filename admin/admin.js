@@ -588,6 +588,84 @@
     { key: 'home_video_intro2', label: 'Úvodní video vpravo (druhé intro)' },
     { key: 'home_video_full', label: 'Velké video přes celou šířku' },
   ];
+
+  // Editable page texts/images (stored in settings under 'cms_<k>').
+  // Prázdné pole = zůstane původní text z webu (fallback).
+  const CMS_GROUPS = [
+    { title: 'Hlavní stránka — texty', fields: [
+      { k: 'home_intro1', label: 'Úvodní odstavec 1', type: 'area', hint: 'Zelené slovo: &lt;span class="green"&gt;text&lt;/span&gt;' },
+      { k: 'home_intro2a', label: 'Úvodní odstavec 2 — první', type: 'area' },
+      { k: 'home_intro2b', label: 'Úvodní odstavec 2 — druhý', type: 'area' },
+      { k: 'home_svc_photo_t', label: 'Služba 1 — nadpis', type: 'text' },
+      { k: 'home_svc_photo', label: 'Služba 1 — text', type: 'area' },
+      { k: 'home_svc_mkt_t', label: 'Služba 2 — nadpis', type: 'text' },
+      { k: 'home_svc_mkt', label: 'Služba 2 — text', type: 'area' },
+      { k: 'home_svc_vid_t', label: 'Služba 3 — nadpis', type: 'text' },
+      { k: 'home_svc_vid', label: 'Služba 3 — text', type: 'area' },
+    ] },
+    { title: 'Marketing', fields: [
+      { k: 'mkt_statement', label: 'Velký nadpis', type: 'text', hint: 'Zelené slovo: &lt;em&gt;text&lt;/em&gt;' },
+      { k: 'mkt_lede', label: 'Úvodní věta', type: 'area' },
+      { k: 'mkt_s1_n', label: 'Služba 1 — název', type: 'text' }, { k: 'mkt_s1_t', label: 'Služba 1 — text', type: 'area' },
+      { k: 'mkt_s2_n', label: 'Služba 2 — název', type: 'text' }, { k: 'mkt_s2_t', label: 'Služba 2 — text', type: 'area' },
+      { k: 'mkt_s3_n', label: 'Služba 3 — název', type: 'text' }, { k: 'mkt_s3_t', label: 'Služba 3 — text', type: 'area' },
+      { k: 'mkt_s4_n', label: 'Služba 4 — název', type: 'text' }, { k: 'mkt_s4_t', label: 'Služba 4 — text', type: 'area' },
+      { k: 'mkt_cta_t', label: 'Výzva — nadpis', type: 'text' },
+      { k: 'mkt_cta_s', label: 'Výzva — text', type: 'area' },
+    ] },
+    { title: 'O mně', fields: [
+      { k: 'about_name', label: 'Jméno', type: 'text' },
+      { k: 'about_subtitle', label: 'Podtitul', type: 'text' },
+      { k: 'about_bio', label: 'Bio text', type: 'area', hint: 'Zelené slovo: &lt;span class="green"&gt;text&lt;/span&gt;' },
+      { k: 'about_portrait', label: 'Portrét (obrázek)', type: 'image' },
+    ] },
+    { title: 'Kontakt — patička (na všech stránkách)', fields: [
+      { k: 'footer_email', label: 'E-mail', type: 'text' },
+      { k: 'footer_phone', label: 'Telefon', type: 'text' },
+      { k: 'footer_address', label: 'Adresa', type: 'area', hint: 'Nový řádek: &lt;br&gt;' },
+    ] },
+  ];
+
+  async function saveCms(k, value) {
+    if (value === '') await guardCall(sb.from('settings').delete().eq('key', 'cms_' + k), 'Vráceno původní');
+    else await guardCall(sb.from('settings').upsert({ key: 'cms_' + k, value }), 'Uloženo');
+  }
+  const cmsVal = (S, k) => { const v = S['cms_' + k]; return (v == null) ? '' : (typeof v === 'object' && 'v' in v ? v.v : v); };
+
+  function cmsSection(group, S) {
+    const sec = el('div', 'cms-group');
+    sec.appendChild(el('h3', 'cms-group-h', esc(group.title)));
+    group.fields.forEach(f => {
+      const cur = cmsVal(S, f.k);
+      const field = el('div', 'field');
+      if (f.type === 'image') {
+        field.innerHTML = `<label>${esc(f.label)}</label>
+          <div class="media-pick">
+            <img class="preview" src="${esc(cur)}" onerror="this.style.opacity=.25">
+            <div class="media-actions"><input type="file" accept="image/*" style="font-size:13px">${cur ? ' <button type="button" class="btn btn-sm btn-danger">Vrátit původní</button>' : ''}</div>
+          </div>`;
+        const fileIn = field.querySelector('input[type=file]');
+        fileIn.onchange = async () => {
+          if (!fileIn.files[0]) return;
+          toast('Nahrávám obrázek…');
+          try { const url = await uploadImage(fileIn.files[0], 'web'); await saveCms(f.k, url); loadWebPanel(); }
+          catch (e) { toast(e.message, true); }
+        };
+        const rb = field.querySelector('.btn-danger');
+        if (rb) rb.onclick = async () => { await saveCms(f.k, ''); loadWebPanel(); };
+      } else {
+        const input = f.type === 'area' ? '<textarea style="min-height:70px"></textarea>' : '<input type="text">';
+        field.innerHTML = `<label>${esc(f.label)}</label>${input}${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
+        const ctrl = field.querySelector('textarea, input');
+        ctrl.value = cur;
+        ctrl.placeholder = '(původní text z webu)';
+        ctrl.onchange = () => saveCms(f.k, ctrl.value.trim());
+      }
+      sec.appendChild(field);
+    });
+    return sec;
+  }
+
   async function loadWebPanel() {
     const panel = $('[data-panel="web"]');
     panel.innerHTML = '<p class="empty-hint">Načítám…</p>';
@@ -597,8 +675,16 @@
       return;
     }
     const S = {};
-    (data || []).forEach(r => { S[r.key] = r.value || {}; });
+    (data || []).forEach(r => { S[r.key] = r.value; });
     panel.innerHTML = '';
+
+    // ---- editable texts & images ----
+    const intro = el('p', '', 'Tady měníš texty a obrázky na webu. Prázdné pole = zůstane původní text. Ukládá se samo, jakmile klikneš mimo pole.');
+    intro.style.cssText = 'margin:0 0 18px;font-size:12.5px;color:var(--fg-dim)';
+    panel.appendChild(intro);
+    CMS_GROUPS.forEach(group => panel.appendChild(cmsSection(group, S)));
+
+    // ---- homepage videos ----
     const head = el('div', 'panel-head');
     head.innerHTML = '<h2>Videa na hlavní stránce</h2><span class="spacer"></span>';
     panel.appendChild(head);
