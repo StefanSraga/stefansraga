@@ -363,25 +363,30 @@
   window.SRTiles = initTiles;
   initTiles(document);
 
-  /* ---------- About timeline: green line fills with scroll ----------
-     getBoundingClientRect() returns VISUAL (zoomed) px, but style.height is
-     applied in LAYOUT px (which the body zoom multiplies again) — so measure
-     in visual px and divide by the zoom before writing the height. */
-  const timeline = document.querySelector('.timeline');
-  if (timeline) {
-    const prog = document.createElement('span');
-    prog.className = 'tl-progress';
-    timeline.appendChild(prog);
+  /* ---------- About story line (.tlx) ----------
+     One scroll handler drives BOTH the green fill and the stop ignition, so
+     the moment the glowing tip reaches a dot its content slides out — always
+     in sync. Zoom gotcha: getBoundingClientRect() returns VISUAL (zoomed) px,
+     but style.height applies in LAYOUT px — divide by the body zoom. */
+  const tlx = document.querySelector('.tlx');
+  if (tlx) {
+    const fill = tlx.querySelector('.tlx-fill');
+    const stops = [...tlx.querySelectorAll('.tlx-item')];
     const z = () => parseFloat(document.body.style.zoom) || 1;
-    function updateProgress() {
-      const r = timeline.getBoundingClientRect();          // visual px
-      const viewMid = window.innerHeight * 0.6;            // visual px
-      const filledVisual = Math.max(0, Math.min(r.height, viewMid - r.top));
-      prog.style.height = (filledVisual / z()) + 'px';     // layout px
+    function updateLine() {
+      const r = tlx.getBoundingClientRect();               // visual px
+      const tip = window.innerHeight * 0.58;               // where the tip "is" on screen
+      const filledVisual = Math.max(0, Math.min(r.height, tip - r.top));
+      if (fill) fill.style.height = (filledVisual / z()) + 'px';   // layout px
+      for (const it of stops) {
+        if (it.classList.contains('on')) continue;
+        const d = it.getBoundingClientRect();
+        if (d.top + d.height / 2 <= tip) it.classList.add('on');   // tip reached the dot
+      }
     }
-    updateProgress();
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    window.addEventListener('resize', updateProgress);
+    updateLine();
+    window.addEventListener('scroll', updateLine, { passive: true });
+    window.addEventListener('resize', updateLine);
   }
 
   /* ---------- Collab carousel (VlaďkySyn) ---------- */
