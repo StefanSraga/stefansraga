@@ -135,18 +135,27 @@
     }
   }
 
-  /* ---------- Typewriter (hero headline): "I turn X into Y" pairs ---------- */
-  const typeEl = document.querySelector('[data-typewriter]');
-  if (typeEl) {
+  /* ---------- Typewriter (hero headline): "I turn X into Y" pairs ----------
+     Exposed as window.SRTypewriter() and restartable: a generation token lets a
+     fresh call supersede any running loop, so site.js can re-run it live after a
+     CMS edit changes the phrase pairs (data-pairs). */
+  let typeGen = 0;
+  function initTypewriter() {
+    const typeEl = document.querySelector('[data-typewriter]');
+    if (!typeEl) return;
+    const myGen = ++typeGen;                         // any older loop now bails
     // pairs separated by "|", first/second separated by ">"
     const pairs = (typeEl.getAttribute('data-pairs') || '')
       .split('|').map(p => p.split('>')).filter(p => p.length === 2);
     const firstSpan = typeEl.querySelector('.type-first');
     const secondSpan = typeEl.querySelector('.type-second');
+    if (!firstSpan || !secondSpan) return;
+    const live = () => myGen === typeGen;            // false once superseded
     const rand = (a, b) => a + Math.random() * (b - a);
     const sleep = ms => new Promise(r => setTimeout(r, ms));
     async function typeInto(el, target, min, max) {
       for (let i = 1; i <= target.length; i++) {
+        if (!live()) return;
         el.textContent = target.slice(0, i);
         await sleep(rand(min, max));
       }
@@ -154,6 +163,7 @@
     async function eraseBoth() {
       let a = firstSpan.textContent, b = secondSpan.textContent;
       while (a.length || b.length) {
+        if (!live()) return;
         if (a.length) a = a.slice(0, -1);
         if (b.length) b = b.slice(0, -1);
         firstSpan.textContent = a;
@@ -163,7 +173,7 @@
     }
     async function loop() {
       let i = 0;
-      for (;;) {
+      while (live()) {
         const [x, y] = pairs[i % pairs.length];
         await typeInto(firstSpan, x, 42, 65);
         await sleep(900);
@@ -180,9 +190,13 @@
         secondSpan.textContent = pairs[0][1];
       }
     } else {
+      firstSpan.textContent = '';
+      secondSpan.textContent = '';
       loop();
     }
   }
+  window.SRTypewriter = initTypewriter;
+  initTypewriter();
 
 
   /* ---------- Camera HUD engines: timecodes + count-ups ----------
@@ -469,6 +483,33 @@
      Also a bandwidth guard: force preload="none" so a heavy clip is only
      downloaded once the viewer actually scrolls near it (not on page load).
      A visitor who lands and bounces never fetches the below-the-fold videos. */
+  /* ---------- Adaptive homepage video renditions ----------
+     Each homepage clip ships two faststart encodes: data-src-hi (default) and
+     data-src-lo (smaller, for slow / data-saver links). Pick one from the
+     Network Information API and set it as the src BEFORE the first play — the
+     play-on-scroll observer below then starts an already-light, quick clip.
+     preload stays "none" so nothing downloads until it scrolls into view.
+     Admin overrides still win: home.js hydrates src from Supabase on an async
+     round-trip that resolves after this synchronous pass. */
+  (function pickVideoRendition() {
+    const vids = document.querySelectorAll('video[data-home-video][data-src-hi]');
+    if (!vids.length) return;
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    let lo = false;
+    if (conn) {
+      const et = conn.effectiveType || '';
+      lo = !!conn.saveData || et === 'slow-2g' || et === '2g' || et === '3g' ||
+           (typeof conn.downlink === 'number' && conn.downlink > 0 && conn.downlink < 2.5);
+    }
+    vids.forEach(v => {
+      const url = v.getAttribute(lo ? 'data-src-lo' : 'data-src-hi') || v.getAttribute('data-src-hi');
+      if (!url) return;
+      v.preload = 'none';
+      if (v.getAttribute('src') !== url) v.src = url;
+      v.dataset.rendition = lo ? 'lo' : 'hi';
+    });
+  })();
+
   const lazyVids = document.querySelectorAll('video[data-autoplay]');
   if (lazyVids.length && 'IntersectionObserver' in window) {
     lazyVids.forEach(v => { v.preload = 'none'; });

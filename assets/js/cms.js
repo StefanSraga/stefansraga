@@ -29,8 +29,10 @@
     getVideos: () => rows(client.from('videos').select('*')
       .eq('published', true).order('sort')),
 
+    // Newest first → the first card (index 0) is always the latest published
+    // post, i.e. the big featured poster frame on the blog is self-updating.
     getPosts: () => rows(client.from('posts').select('*')
-      .eq('published', true).order('sort')),
+      .eq('published', true).order('created_at', { ascending: false })),
 
     // No explicit published filter here on purpose: RLS hides drafts from
     // anonymous visitors, but a logged-in admin (same browser as /admin)

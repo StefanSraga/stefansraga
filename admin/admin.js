@@ -602,6 +602,18 @@
       { k: 'home_svc_mkt', label: 'Služba 2 — text', type: 'area', green: true },
       { k: 'home_svc_vid_t', label: 'Služba 3 — nadpis', type: 'text' },
       { k: 'home_svc_vid', label: 'Služba 3 — text', type: 'area', green: true },
+      { k: 'home_services_title', label: 'Nadpis sekce „My Services"', type: 'text' },
+    ] },
+    { title: 'Domů — hero', fields: [
+      { k: 'home_hero_pairs', label: 'Animované fráze v hero', type: 'area', hint: 'Formát: prvni&gt;druhe|dalsi&gt;dalsi — píše se do věty „I turn PRVNI into DRUHE". Páry odděl |, uvnitř páru &gt;.' },
+      { k: 'home_hero_img', label: 'Hero úvodní fotka', type: 'image' },
+    ] },
+    { title: 'Domů — běžící pásy', fields: [
+      { k: 'home_marquee1', label: 'Běžící pás 1 (text)', type: 'text' },
+      { k: 'home_marquee2', label: 'Běžící pás 2 (text)', type: 'text' },
+    ] },
+    { title: 'Hlavička (na všech stránkách)', fields: [
+      { k: 'home_since', label: 'Odznak „SINCE 2015"', type: 'text' },
     ] },
     { title: 'Marketing', fields: [
       { k: 'mkt_statement', label: 'Velký nadpis', type: 'text', green: 'em' },
@@ -614,10 +626,23 @@
       { k: 'mkt_cta_s', label: 'Výzva — text', type: 'area', green: true },
     ] },
     { title: 'O mně', fields: [
+      { k: 'about_title', label: 'Nadpis stránky', type: 'text' },
       { k: 'about_name', label: 'Jméno', type: 'text' },
       { k: 'about_subtitle', label: 'Podtitul', type: 'text' },
       { k: 'about_bio', label: 'Bio text', type: 'area', green: true },
       { k: 'about_portrait', label: 'Portrét (obrázek)', type: 'image' },
+      { k: 'about_story_heading', label: 'Nadpis „This is my Story"', type: 'text' },
+    ] },
+    { title: 'Fotky', fields: [
+      { k: 'photos_title', label: 'Nadpis stránky', type: 'text' },
+      ...['Intel Cologne Major', 'Football', 'Ice Hockey', 'Event Experience', 'Power Performance', 'Rally Prague Revival', 'Urbex', 'Comic-Con'].flatMap((name, i) => [
+        { k: `photos_card${i + 1}_t`, label: `Karta ${i + 1} (${name}) — nadpis`, type: 'text' },
+        { k: `photos_card${i + 1}_d`, label: `Karta ${i + 1} (${name}) — popis`, type: 'area', green: true },
+        { k: `photos_card${i + 1}_img`, label: `Karta ${i + 1} (${name}) — obrázek`, type: 'image' },
+      ]),
+    ] },
+    { title: 'Videos', fields: [
+      { k: 'videos_title', label: 'Nadpis stránky', type: 'text' },
     ] },
     { title: 'Kontakt — patička (na všech stránkách)', fields: [
       { k: 'footer_email', label: 'E-mail', type: 'text' },
@@ -630,15 +655,16 @@
   // with what's actually on the site — much easier to orient than an empty box.
   async function loadCmsDefaults() {
     const DEF = {};
-    const pages = ['../', '../marketing/', '../about-me/'];
+    const pages = ['../', '../marketing/', '../about-me/', '../photos/', '../videos/'];
     for (const p of pages) {
       try {
         const html = await (await fetch(p, { cache: 'no-cache' })).text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
-        doc.querySelectorAll('[data-cms-html],[data-cms-text],[data-cms-src],[data-cms-mail],[data-cms-tel]').forEach(el => {
+        doc.querySelectorAll('[data-cms-html],[data-cms-text],[data-cms-src],[data-cms-mail],[data-cms-tel],[data-cms-attr]').forEach(el => {
           let k;
           if ((k = el.getAttribute('data-cms-html'))) DEF[k] = el.innerHTML.replace(/\s+/g, ' ').trim();
           else if ((k = el.getAttribute('data-cms-src'))) DEF[k] = el.getAttribute('src') || '';
+          else if ((k = el.getAttribute('data-cms-attr'))) { const ci = k.indexOf(':'); if (ci > 0) DEF[k.slice(ci + 1)] = el.getAttribute(k.slice(0, ci)) || ''; }
           else if ((k = el.getAttribute('data-cms-text') || el.getAttribute('data-cms-mail') || el.getAttribute('data-cms-tel'))) DEF[k] = el.textContent.replace(/\s+/g, ' ').trim();
         });
       } catch (e) { /* page not reachable — field just stays empty */ }

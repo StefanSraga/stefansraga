@@ -18,6 +18,11 @@
   const filtersEl = root.querySelector('.vid-filters');
   const gridEl = root.querySelector('.vid-grid');
   const emptyEl = root.querySelector('.vid-empty');
+  const pagerEl = document.createElement('nav');
+  pagerEl.className = 'vid-pager';
+  pagerEl.setAttribute('aria-label', 'Stránkování videí');
+  if (emptyEl && emptyEl.parentNode) emptyEl.parentNode.insertBefore(pagerEl, emptyEl.nextSibling);
+  else root.appendChild(pagerEl);
 
   const esc = s => String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -33,19 +38,22 @@
     return null;
   }
   function kind(v) {
-    if (!v.video) return 'soon';
-    if (youtubeId(v.video)) return 'youtube';
-    return 'file';
+    if (v.video) return youtubeId(v.video) ? 'youtube' : 'file';
+    if (v.images && v.images.length) return 'gallery';   // photo-only entry (e.g. a collab)
+    return 'soon';
   }
   function posterFor(v) {
     if (v.poster) return asset(v.poster);
     const id = youtubeId(v.video);
     if (id) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;  // automatic YouTube thumbnail
+    if (v.images && v.images.length) return asset(v.images[0]);
     return '';
   }
 
   let DATA = null;
   let active = 'all';
+  let page = 1;
+  const PER_PAGE = parseInt(root.getAttribute('data-per-page'), 10) || 9;
 
   /* ---------- modal player ---------- */
   const modal = document.createElement('div');
@@ -65,6 +73,19 @@
       stage.innerHTML = `<div class="vm-16x9"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${esc(v.title)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
     } else if (k === 'file') {
       stage.innerHTML = `<video src="${asset(v.video)}" poster="${posterFor(v)}" controls autoplay playsinline class="${v.orientation === 'portrait' ? 'portrait' : ''}"></video>`;
+    } else if (k === 'gallery') {
+      let idx = 0;
+      const imgs = v.images.map(asset);
+      const draw = () => {
+        stage.innerHTML = `<div class="vm-gallery">
+          <img src="${imgs[idx]}" alt="${esc(v.title)}">
+          ${imgs.length > 1 ? `<button class="vm-gnav vm-gprev" aria-label="Předchozí">&#8249;</button><button class="vm-gnav vm-gnext" aria-label="Další">&#8250;</button><span class="vm-gcount">${idx + 1} / ${imgs.length}</span>` : ''}
+        </div>`;
+        const p = stage.querySelector('.vm-gprev'), n = stage.querySelector('.vm-gnext');
+        if (p) p.onclick = e => { e.stopPropagation(); idx = (idx - 1 + imgs.length) % imgs.length; draw(); };
+        if (n) n.onclick = e => { e.stopPropagation(); idx = (idx + 1) % imgs.length; draw(); };
+      };
+      draw();
     } else { return; }
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -87,6 +108,7 @@
     filtersEl.querySelectorAll('.vid-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         active = btn.getAttribute('data-cat');
+        page = 1;   // new filter → back to first page
         filtersEl.querySelectorAll('.vid-chip').forEach(b => b.classList.toggle('active', b === btn));
         renderGrid();
       });
@@ -115,19 +137,41 @@
 
   function renderGrid() {
     const list = (DATA.videos || []).filter(v => active === 'all' || v.category === active);
+    const pageCount = Math.max(1, Math.ceil(list.length / PER_PAGE));
+    if (page > pageCount) page = pageCount;
     if (!list.length) {
       gridEl.innerHTML = '';
+      renderPager(1);
       if (emptyEl) { emptyEl.hidden = false; emptyEl.textContent = 'No videos in this category yet.'; }
       return;
     }
     if (emptyEl) emptyEl.hidden = true;
-    gridEl.innerHTML = list.map((v, i) => cardHTML(v, i)).join('');
+    const slice = list.slice((page - 1) * PER_PAGE, page * PER_PAGE);   // only this page's cards
+    gridEl.innerHTML = slice.map((v, i) => cardHTML(v, i)).join('');
     requestAnimationFrame(() => gridEl.querySelectorAll('.vid-card').forEach(c => c.classList.add('in')));
     gridEl.querySelectorAll('.vid-card').forEach(card => {
-      const v = list[+card.getAttribute('data-i')];
+      const v = slice[+card.getAttribute('data-i')];
       if (kind(v) === 'soon') return;
       card.addEventListener('click', () => openModal(v));
     });
+    renderPager(pageCount);
+  }
+
+  // page navigation — appears only once the list overflows one page
+  function renderPager(pageCount) {
+    if (pageCount <= 1) { pagerEl.innerHTML = ''; return; }
+    let html = `<button class="vp-btn vp-arrow" data-go="prev"${page === 1 ? ' disabled' : ''} aria-label="Předchozí">&#8249;</button>`;
+    for (let i = 1; i <= pageCount; i++) html += `<button class="vp-btn vp-num${i === page ? ' active' : ''}" data-go="${i}">${i}</button>`;
+    html += `<button class="vp-btn vp-arrow" data-go="next"${page === pageCount ? ' disabled' : ''} aria-label="Další">&#8250;</button>`;
+    pagerEl.innerHTML = html;
+    pagerEl.querySelectorAll('.vp-btn').forEach(b => b.addEventListener('click', () => {
+      const g = b.getAttribute('data-go');
+      if (g === 'prev') page = Math.max(1, page - 1);
+      else if (g === 'next') page = Math.min(pageCount, page + 1);
+      else page = +g;
+      renderGrid();
+      root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
   }
 
   /* ---------- load ----------
@@ -148,9 +192,25 @@
       });
   }
 
+  // The Supabase videos table can't store multi-image galleries, so fold any
+  // static "images" entries (e.g. the VlaďkySyn collab) into the live list too.
+  function withStaticGalleries(categories, videos) {
+    return fetch(FEED, { cache: 'no-cache' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (j && Array.isArray(j.videos)) {
+          const have = new Set(videos.map(v => v.id));
+          j.videos.filter(v => v.images && v.images.length && !have.has(v.id)).forEach(v => videos.push(v));
+        }
+        return { categories, videos };
+      })
+      .catch(() => ({ categories, videos }));
+  }
+
   if (window.SR && window.SR.ready) {
     Promise.all([window.SR.getCategories(), window.SR.getVideos()])
-      .then(([categories, videos]) => boot({ categories, videos }))
+      .then(([categories, videos]) => withStaticGalleries(categories, videos))
+      .then(boot)
       .catch(() => fromJson());   // network / RLS issue → static fallback
   } else {
     fromJson();
