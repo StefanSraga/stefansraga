@@ -726,6 +726,19 @@ article .prose img.tall {
 .rec { color: var(--accent); font-weight: 700; animation: rec-blink 1.2s steps(1) infinite; }
 @keyframes rec-blink { 50% { opacity: 0.15; } }
 
+/* owner-chosen WIDE (rectangular) card — full-row image-left / text-right split.
+   Placed in DOM order (no grid-auto-flow:dense) so it never reshuffles on resize. */
+.post-card.wide:not(.featured) {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+}
+.post-card.wide:not(.featured) .cover img { aspect-ratio: 16 / 10; }
+.post-card.wide:not(.featured) .body { padding: 0 2px; }
+.post-card.wide:not(.featured) h2 { font-size: clamp(24px, 2.6vw, 40px); -webkit-line-clamp: 2; }
+
 /* contact-sheet entrance stagger (static pages; hydrated cards render instantly) */
 .post-list .post-card.reveal:nth-child(2) { transition-delay: .06s; }
 .post-list .post-card.reveal:nth-child(3) { transition-delay: .12s; }
@@ -735,7 +748,9 @@ article .prose img.tall {
 .post-list .post-card.reveal:nth-child(n+7) { transition-delay: .36s; }
 
 @media (max-width: 900px) {
-  .post-card:not(.featured) { grid-column: span 12; display: flex; flex-direction: column; }
+  .post-card:not(.featured),
+  .post-card.wide:not(.featured) { grid-column: span 12; display: flex; flex-direction: column; }
+  .post-card.wide:not(.featured) .body { padding: 14px 2px 0; }
   .post-card.featured h2 { font-size: clamp(30px, 8vw, 52px); }
   .post-card.featured .cover:empty,
   .post-card.featured .cover img { height: clamp(320px, 52vh, 460px); }

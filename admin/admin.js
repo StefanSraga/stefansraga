@@ -358,6 +358,13 @@
       </div>
       <div class="field-row">
         <div class="field"><label>Čas čtení</label><input type="text" id="f-read" value="${esc(p.read_time)}" placeholder="Minut čtení: 2"></div>
+        <div class="field"><label>Tvar na blogu</label>
+          <select id="f-layout">
+            <option value="normal" ${(p.layout || 'normal') !== 'wide' ? 'selected' : ''}>Čtvercová (v mřížce)</option>
+            <option value="wide" ${p.layout === 'wide' ? 'selected' : ''}>Obdélníková (přes celou šířku)</option>
+          </select>
+          <span class="hint">První článek je vždycky ten velký nahoře. Tady u ostatních volíš tvar.</span>
+        </div>
         <div class="field"><label>Zveřejněno</label><div class="checkline"><input type="checkbox" id="f-pub" ${p.published ? 'checked' : ''}> viditelné</div></div>
       </div>
     `, async () => {
@@ -376,6 +383,10 @@
         cover, excerpt: val('f-excerpt'), body,
         date: val('f-date'), read_time: val('f-read'), published: checked('f-pub'),
       };
+      // layout column exists only after the 2026-07 migration — send it only when
+      // used, so saving keeps working on a not-yet-migrated database
+      const lay = val('f-layout') || 'normal';
+      if (lay === 'wide' || p.layout) rec.layout = lay;
       // tags column exists only after the 2026-07 schema update — send it only
       // when it's actually used, so saving keeps working on older databases
       const tagsRaw = val('f-tags');

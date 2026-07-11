@@ -11,6 +11,7 @@
      the index — keep the (p, i) signature if you ever refactor. */
   function postCard(p, i) {
     const featured = i === 0;
+    const wide = !featured && p.layout === 'wide';   // owner-chosen rectangular card
     const excerpt = (p.excerpt && p.excerpt.trim()) || plain(p.body).slice(0, 190);
     const rt = (p.read_time || '').trim();
     const views = parseInt(p.views, 10) || 0;
@@ -18,7 +19,7 @@
     const meta = featured
       ? `<div class="meta"><span class="tc" data-timer>00:00:00</span><span class="rec">&#9679; REC</span><span>${esc(p.date)}</span>${rt ? `<span>&middot; ${esc(rt)}</span>` : ''}</div>`
       : `<div class="meta"><span>${esc(p.date)}</span>${rt ? `<span>&middot;</span><span>${esc(rt)}</span>` : ''}</div>`;
-    return `<a class="post-card reveal visible${featured ? ' featured' : ''}" href="/post/${encodeURI(p.slug)}/">
+    return `<a class="post-card reveal visible${featured ? ' featured' : ''}${wide ? ' wide' : ''}" href="/post/${encodeURI(p.slug)}/">
       <div class="cover">${p.cover ? `<img src="${esc(p.cover)}" alt="${esc(p.title)}" loading="${featured ? 'eager' : 'lazy'}">` : ''}</div>
       <div class="body">
         ${meta}

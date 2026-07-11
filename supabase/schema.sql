@@ -72,6 +72,10 @@ create table if not exists public.galleries (
 -- article tags (filtering + search on the blog)
 alter table public.posts add column if not exists tags text[] not null default '{}';
 
+-- blog card shape the owner picks per post: 'normal' (square, 2-up grid) or
+-- 'wide' (rectangular, full-width split). The first post is always the big one.
+alter table public.posts add column if not exists layout text not null default 'normal';
+
 -- site settings (key/value; e.g. homepage videos swapped from the admin)
 create table if not exists public.settings (
   key         text primary key,
