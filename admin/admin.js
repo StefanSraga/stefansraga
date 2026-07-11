@@ -414,11 +414,14 @@
       if (bimg) bimg.onchange = async () => {
         const file = bimg.files[0];
         if (!file) return;
+        const k = prompt('Jak obrázek zobrazit?\n\n1 = normální (v šířce textu)\n2 = na šířku (velký, přes celou plochu)\n3 = na výšku (portrét, vysoký)', '1');
+        if (k === null) { bimg.value = ''; return; }
+        const cls = k.trim() === '2' ? ' class="wide"' : k.trim() === '3' ? ' class="tall"' : '';
         toast('Nahrávám obrázek…');
         try {
           const url = await uploadImage(file, 'posts');
           const s = ta.selectionStart;
-          ta.setRangeText(`\n<img src="${url}" alt="">\n`, s, s, 'end');
+          ta.setRangeText(`\n<img${cls} src="${url}" alt="">\n`, s, s, 'end');
           toast('Obrázek vložen do textu');
         } catch (e) { toast(e.message || 'Chyba nahrávání', true); }
         bimg.value = '';

@@ -14,8 +14,8 @@
   --fg-dim: #9a9a9a;
   --accent: #18C118;
   --accent-soft: #7CFC7C;
-  --line: rgba(255, 255, 255, 0.85);
-  --line-dim: rgba(255, 255, 255, 0.25);
+  --line: rgba(255, 255, 255, 0.16);
+  --line-dim: rgba(255, 255, 255, 0.10);
   --radius-card: 26px;
   --radius-media: 18px;
   --font-display: 'Anton', Impact, 'Arial Narrow Bold', sans-serif;
@@ -102,7 +102,9 @@ a { color: inherit; text-decoration: none; }
 }
 .since::before { content: '\2E28 '; color: var(--accent); }
 
-.linkedin-link svg { width: 18px; height: 18px; fill: #fff; }
+.socials { display: flex; align-items: center; gap: 12px; }
+.linkedin-link { display: inline-flex; }
+.linkedin-link svg { width: 18px; height: 18px; fill: #fff; transition: fill .2s ease; }
 .linkedin-link:hover svg { fill: var(--accent); }
 
 /* mobile nav */
@@ -328,10 +330,11 @@ a { color: inherit; text-decoration: none; }
   transition: transform .45s ease;
 }
 .card-row:hover .media img { transform: scale(1.045); }
-.card-row:hover { border-color: var(--accent); }
-/* .reveal's transition shorthand would drop the border ease — restate it here */
+/* one identical hover on every card: green frame + soft green glow */
+.card-row:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 16px 48px rgba(24, 193, 24, 0.10); }
+/* .reveal's transition shorthand would drop the border/shadow ease — restate it */
 .card-row.reveal {
-  transition: opacity .95s cubic-bezier(.16, 1, .3, 1), transform .95s cubic-bezier(.16, 1, .3, 1), border-color .3s ease;
+  transition: opacity .95s cubic-bezier(.16, 1, .3, 1), transform .95s cubic-bezier(.16, 1, .3, 1), border-color .3s ease, box-shadow .3s ease;
 }
 /* stretched link: the title's link covers the whole card (soon-cards have none) */
 .card-row h2 a::after { content: ''; position: absolute; inset: 0; }
@@ -446,7 +449,21 @@ article .prose > p:first-of-type::first-letter {
   padding: 6px 14px 0 0;
   color: var(--accent);
 }
-article .prose img { border: 1px solid rgba(255,255,255,0.1); }
+/* article body images — orientation the owner picks in the editor:
+   default = fits the text column, .wide = breaks out big, .tall = portrait */
+article .prose img { display: block; width: 100%; height: auto; margin: 28px auto; border: 1px solid rgba(255,255,255,0.1); }
+article .prose img.wide {
+  width: min(1080px, 92vw);
+  max-width: none;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+article .prose img.tall {
+  width: auto;
+  max-width: 100%;
+  max-height: 84vh;
+  margin: 28px auto;
+}
 .prose h1, .prose h2, .prose h3 {
   font-family: var(--font-display);
   text-transform: uppercase;
@@ -529,7 +546,7 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: clamp(34px, 3.6vh, 56px) clamp(20px, 2vw, 30px);
-  grid-auto-flow: row dense;
+  align-items: start;
   counter-reset: frame;
 }
 .post-card { counter-increment: frame; position: relative; }
@@ -709,18 +726,6 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
 .rec { color: var(--accent); font-weight: 700; animation: rec-blink 1.2s steps(1) infinite; }
 @keyframes rec-blink { 50% { opacity: 0.15; } }
 
-/* --- every 4th frame widens into a cinematic split --- */
-.post-card:not(.featured):nth-of-type(4n) {
-  grid-column: span 12;
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  align-items: center;
-  gap: clamp(20px, 3vw, 48px);
-}
-.post-card:not(.featured):nth-of-type(4n) .cover img { aspect-ratio: 16 / 10; }
-.post-card:not(.featured):nth-of-type(4n) .body { padding: 0 2px; }
-.post-card:not(.featured):nth-of-type(4n) h2 { font-size: clamp(24px, 2.6vw, 40px); }
-
 /* contact-sheet entrance stagger (static pages; hydrated cards render instantly) */
 .post-list .post-card.reveal:nth-child(2) { transition-delay: .06s; }
 .post-list .post-card.reveal:nth-child(3) { transition-delay: .12s; }
@@ -730,9 +735,7 @@ article .prose img { border: 1px solid rgba(255,255,255,0.1); }
 .post-list .post-card.reveal:nth-child(n+7) { transition-delay: .36s; }
 
 @media (max-width: 900px) {
-  .post-card:not(.featured),
-  .post-card:not(.featured):nth-of-type(4n) { grid-column: span 12; display: flex; flex-direction: column; }
-  .post-card:not(.featured):nth-of-type(4n) .body { padding: 14px 2px 0; }
+  .post-card:not(.featured) { grid-column: span 12; display: flex; flex-direction: column; }
   .post-card.featured h2 { font-size: clamp(30px, 8vw, 52px); }
   .post-card.featured .cover:empty,
   .post-card.featured .cover img { height: clamp(320px, 52vh, 460px); }
