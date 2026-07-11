@@ -930,6 +930,8 @@ article .prose img.tall {
     opacity: 1; transform: none; transition: none;
   }
   .tlx-year { background-size: 100% 3px; transition: none; }
+  .tlx-media img { transform: none; }
+  .tlx-fill::after { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1526,7 +1528,7 @@ article .prose img.tall {
   box-shadow: 0 0 12px rgba(24, 193, 24, 0.55);
   position: relative;
 }
-.tlx-fill::after {   /* the travelling glowing tip */
+.tlx-fill::after {   /* the travelling glowing tip — breathes softly */
   content: '';
   position: absolute;
   left: 50%; bottom: -5px;
@@ -1535,16 +1537,28 @@ article .prose img.tall {
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 16px 4px rgba(24, 193, 24, 0.75);
+  animation: tlx-breathe 2.6s ease-in-out infinite;
+}
+@keyframes tlx-breathe {
+  50% { box-shadow: 0 0 24px 7px rgba(24, 193, 24, 0.9); }
 }
 
-/* --- a stop --- */
+/* --- a stop = a tall scroll segment with a sticky stage ----------------
+   The stage pins to the viewport while you scroll through the segment, so
+   every stop genuinely HOLDS on screen (no scroll-snap, no jumping — it's
+   plain native scrolling; the segment height sets how long it holds). */
 .tlx-item {
   position: relative;
+  height: calc(155vh / var(--z, 1));
+}
+.tlx-item.noimg { height: calc(115vh / var(--z, 1)); }
+.tlx-stage {
+  position: sticky;
+  top: 0;
+  height: calc(100vh / var(--z, 1));
   display: grid;
   grid-template-columns: 1fr clamp(76px, 9vw, 140px) 1fr;
   align-items: center;
-  padding-block: clamp(40px, 7vh, 84px);
-  scroll-snap-align: center;   /* the gentle "hold" (html has y proximity) */
 }
 .tlx-dot {
   position: absolute;
@@ -1614,6 +1628,10 @@ article .prose img.tall {
   border-radius: var(--radius-media);
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: var(--bg-card);
+  /* scroll-linked settle: the photo eases from a touch larger + lower into
+     place as you scroll through the stop (--p set by main.js, 0→1) */
+  transform: scale(calc(1.05 - 0.05 * var(--p, 1))) translateY(calc((1 - var(--p, 1)) * 20px));
+  will-change: transform;
 }
 
 /* --- even stops swap sides --- */
@@ -1638,9 +1656,18 @@ article .prose img.tall {
 
 @media (max-width: 820px) {
   .about-hero { grid-template-columns: 1fr; }
-  /* line moves to the left edge, everything reads on one side */
+  /* line moves to the left edge, everything reads on one side; no pinning
+     on phones — segments are natural height and content just slides in */
   .tlx-track { left: 18px; transform: none; }
-  .tlx-item { grid-template-columns: 1fr; gap: 18px; padding-left: 46px; padding-block: 34px; }
+  .tlx-item, .tlx-item.noimg { height: auto; }
+  .tlx-stage {
+    position: relative;
+    top: auto;
+    height: auto;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 34px 0 34px 46px;
+  }
   .tlx-dot { left: 19.5px; }
   .tlx-info,
   .tlx-item:nth-child(even) .tlx-info { grid-column: 1; grid-row: auto; justify-self: start; text-align: left; }
@@ -1649,10 +1676,10 @@ article .prose img.tall {
   .tlx-item:nth-child(even) .tlx-year { background-position: left 100%; }
   .tlx-media,
   .tlx-item:nth-child(even) .tlx-media { grid-column: 1; grid-row: auto; justify-self: start; }
-  .tlx-media img { width: 100%; }
   .tlx-item .tlx-info, .tlx-item .tlx-media,
   .tlx-item:nth-child(even) .tlx-info, .tlx-item:nth-child(even) .tlx-media { transform: translateX(-36px); }
   .tlx-item.on .tlx-info, .tlx-item.on .tlx-media { transform: none; }
+  .tlx-media img { transform: none; }   /* no parallax when not pinned */
 }
 
 /* ---------- Marketing page ---------- */

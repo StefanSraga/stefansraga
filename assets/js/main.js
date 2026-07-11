@@ -379,9 +379,16 @@
       const filledVisual = Math.max(0, Math.min(r.height, tip - r.top));
       if (fill) fill.style.height = (filledVisual / z()) + 'px';   // layout px
       for (const it of stops) {
-        if (it.classList.contains('on')) continue;
-        const d = it.getBoundingClientRect();
-        if (d.top + d.height / 2 <= tip) it.classList.add('on');   // tip reached the dot
+        const stage = it.firstElementChild || it;          // .tlx-stage (pins while the item scrolls)
+        const d = stage.getBoundingClientRect();
+        // ignition: the tip reached this stop's dot (stage centre)
+        if (!it.classList.contains('on') && d.top + d.height / 2 <= tip) it.classList.add('on');
+        // progress through the pinned hold (0→1) — drives the photo settle.
+        // Ratio of two visual-px distances, so the zoom cancels out.
+        const ir = it.getBoundingClientRect();
+        const span = ir.height - d.height;
+        const p = span > 40 ? Math.max(0, Math.min(1, (d.top - ir.top) / span)) : 1;
+        it.style.setProperty('--p', p.toFixed(3));
       }
     }
     updateLine();
