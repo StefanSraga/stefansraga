@@ -929,9 +929,11 @@ article .prose img.tall {
   .masonry.reveal a {
     opacity: 1; transform: none; transition: none;
   }
-  .tlx-year { background-size: 100% 3px; transition: none; }
+  .tlx-year::after { transform: scaleX(1); transition: none; }
   .tlx-media img { transform: none; }
   .tlx-fill::after { animation: none; }
+  .tlx-dot { scale: 1; box-shadow: none; }
+  .tlx-item.near .tlx-dot::before { animation: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1543,39 +1545,48 @@ article .prose img.tall {
   50% { box-shadow: 0 0 24px 7px rgba(24, 193, 24, 0.9); }
 }
 
-/* --- a stop = a tall scroll segment with a sticky stage ----------------
-   The stage pins to the viewport while you scroll through the segment, so
-   every stop genuinely HOLDS on screen (no scroll-snap, no jumping — it's
-   plain native scrolling; the segment height sets how long it holds). */
+/* --- a stop (compact rhythm, natural scroll — no pinning, no snapping) --- */
 .tlx-item {
   position: relative;
-  height: calc(155vh / var(--z, 1));
-}
-.tlx-item.noimg { height: calc(115vh / var(--z, 1)); }
-.tlx-stage {
-  position: sticky;
-  top: 0;
-  height: calc(100vh / var(--z, 1));
   display: grid;
   grid-template-columns: 1fr clamp(76px, 9vw, 140px) 1fr;
   align-items: center;
+  padding-block: clamp(40px, 7vh, 84px);
 }
+/* the dot LIVES with the scroll: it grows + glows as the glowing tip
+   approaches (--t 1 = tip right here, 0 = far away) and shrinks back
+   as the tip travels on. Scroll-linked, no transitions needed. */
 .tlx-dot {
   position: absolute;
   left: 50%; top: 50%;
   translate: -50% -50%;
+  scale: calc(1 + var(--t, 0) * 1.35);
   width: 13px; height: 13px;
   border-radius: 50%;
   background: var(--bg);
   border: 1.5px solid rgba(255, 255, 255, 0.35);
-  transition: background .35s ease, border-color .35s ease, box-shadow .35s ease, scale .35s ease;
+  box-shadow: 0 0 calc(var(--t, 0) * 22px) calc(var(--t, 0) * 6px) rgba(24, 193, 24, 0.55);
+  transition: background .35s ease, border-color .35s ease;
   z-index: 2;
 }
 .tlx-item.on .tlx-dot {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 0 5px rgba(24, 193, 24, 0.22), 0 0 18px var(--accent);
-  scale: 1.15;
+}
+/* radar ping on the stop the tip is currently at */
+.tlx-dot::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+}
+.tlx-item.near .tlx-dot::before { animation: tlx-ping 1.7s ease-out infinite; }
+@keyframes tlx-ping {
+  0%   { opacity: 0.8; scale: 0.55; }
+  80%  { opacity: 0;   scale: 2.3; }
+  100% { opacity: 0;   scale: 2.3; }
 }
 
 /* --- year + caption (odd: left of the line, right-aligned) --- */
@@ -1587,6 +1598,7 @@ article .prose img.tall {
   max-width: 520px;
 }
 .tlx-year {
+  position: relative;
   display: inline-block;
   font-family: var(--font-display);
   font-weight: 400;
@@ -1595,14 +1607,29 @@ article .prose img.tall {
   line-height: 1.0;
   letter-spacing: 0.01em;
   color: var(--fg);
-  /* green sweep-underline draws in when the stop ignites (site motif) */
-  background: linear-gradient(var(--accent), var(--accent)) right 100% / 0 3px no-repeat;
-  padding-bottom: 8px;
-  transition: background-size .7s cubic-bezier(.16, 1, .3, 1) .25s;
+  padding-bottom: 10px;
 }
-.tlx-item.on .tlx-year { background-size: 100% 3px; }
+/* glowing underline draws itself OUT OF THE LINE when the stop ignites */
+.tlx-year::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(24, 193, 24, 0.75);
+  transform: scaleX(0);
+  transform-origin: right center;          /* odd stop: text sits left of the line */
+  transition: transform .8s cubic-bezier(.16, 1, .3, 1) .3s;
+}
+.tlx-item.on .tlx-year::after { transform: scaleX(1); }
+.tlx-item:nth-child(even) .tlx-year::after { transform-origin: left center; }
 .tlx-sep { color: var(--accent); }
+/* year digits roll up when igniting — green while counting */
+.tlx-num { font-style: normal; font-weight: 400; transition: color .3s ease; }
+.tlx-num.counting { color: var(--accent); }
 .tlx-cap {
+  position: relative;
   margin: 12px 0 0;
   font-weight: 300;
   font-size: clamp(15px, 1.2vw, 18px);
@@ -1611,6 +1638,17 @@ article .prose img.tall {
   max-width: 44ch;
 }
 .tlx-info .tlx-cap { margin-left: auto; }
+/* typewriter: the ghost keeps the layout, the visible layer types itself in
+   (engine adds .typewrite and fills .tlx-cap-type; no JS = plain caption) */
+.tlx-cap-type { position: absolute; inset: 0; display: none; }
+.tlx-cap.typewrite .tlx-cap-ghost { visibility: hidden; }
+.tlx-cap.typewrite .tlx-cap-type { display: block; }
+.tlx-cap-type.typing::after {
+  content: '\258D';
+  color: var(--accent);
+  animation: tlx-caret 0.8s steps(1) infinite;
+}
+@keyframes tlx-caret { 50% { opacity: 0; } }
 
 /* --- photo (odd: right of the line) --- */
 .tlx-media {
@@ -1628,9 +1666,9 @@ article .prose img.tall {
   border-radius: var(--radius-media);
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: var(--bg-card);
-  /* scroll-linked settle: the photo eases from a touch larger + lower into
-     place as you scroll through the stop (--p set by main.js, 0→1) */
-  transform: scale(calc(1.05 - 0.05 * var(--p, 1))) translateY(calc((1 - var(--p, 1)) * 20px));
+  /* scroll-linked breath: the photo lifts + sharpens as the tip approaches
+     and settles back as it travels on (--t = proximity, set by main.js) */
+  transform: translateY(calc((1 - var(--t, 1)) * 12px)) scale(calc(0.985 + 0.015 * var(--t, 1)));
   will-change: transform;
 }
 
@@ -1656,30 +1694,20 @@ article .prose img.tall {
 
 @media (max-width: 820px) {
   .about-hero { grid-template-columns: 1fr; }
-  /* line moves to the left edge, everything reads on one side; no pinning
-     on phones — segments are natural height and content just slides in */
+  /* line moves to the left edge, everything reads on one side */
   .tlx-track { left: 18px; transform: none; }
-  .tlx-item, .tlx-item.noimg { height: auto; }
-  .tlx-stage {
-    position: relative;
-    top: auto;
-    height: auto;
-    grid-template-columns: 1fr;
-    gap: 18px;
-    padding: 34px 0 34px 46px;
-  }
+  .tlx-item { grid-template-columns: 1fr; gap: 18px; padding: 34px 0 34px 46px; }
   .tlx-dot { left: 19.5px; }
   .tlx-info,
   .tlx-item:nth-child(even) .tlx-info { grid-column: 1; grid-row: auto; justify-self: start; text-align: left; }
   .tlx-info .tlx-cap { margin-left: 0; }
-  .tlx-year,
-  .tlx-item:nth-child(even) .tlx-year { background-position: left 100%; }
+  .tlx-year::after,
+  .tlx-item:nth-child(even) .tlx-year::after { transform-origin: left center; }
   .tlx-media,
   .tlx-item:nth-child(even) .tlx-media { grid-column: 1; grid-row: auto; justify-self: start; }
   .tlx-item .tlx-info, .tlx-item .tlx-media,
   .tlx-item:nth-child(even) .tlx-info, .tlx-item:nth-child(even) .tlx-media { transform: translateX(-36px); }
   .tlx-item.on .tlx-info, .tlx-item.on .tlx-media { transform: none; }
-  .tlx-media img { transform: none; }   /* no parallax when not pinned */
 }
 
 /* ---------- Marketing page ---------- */

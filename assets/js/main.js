@@ -373,23 +373,64 @@
     const fill = tlx.querySelector('.tlx-fill');
     const stops = [...tlx.querySelectorAll('.tlx-item')];
     const z = () => parseFloat(document.body.style.zoom) || 1;
+    const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // stop ignition: year digits roll up + the caption types itself in
+    function ignite(it) {
+      it.classList.add('on');
+      if (noMotion) return;
+      it.querySelectorAll('.tlx-num[data-y]').forEach(n => {
+        const target = parseInt(n.getAttribute('data-y'), 10);
+        if (!target) return;
+        const from = target - 9;
+        let step = 0;
+        const steps = 22;                                  // ~0.75 s roll
+        n.classList.add('counting');
+        (function tick() {
+          step++;
+          const e = 1 - Math.pow(1 - step / steps, 3);     // ease-out
+          n.textContent = Math.round(from + (target - from) * e);
+          if (step < steps) setTimeout(tick, 34);
+          else n.classList.remove('counting');
+        })();
+      });
+      const cap = it.querySelector('.tlx-cap');
+      const ghost = it.querySelector('.tlx-cap-ghost');
+      const typed = it.querySelector('.tlx-cap-type');
+      if (cap && ghost && typed) {
+        const txt = ghost.textContent;
+        let i = 0;
+        cap.classList.add('typewrite');
+        typed.classList.add('typing');
+        (function type() {
+          i++;
+          typed.textContent = txt.slice(0, i);
+          if (i < txt.length) setTimeout(type, 13);
+          else setTimeout(() => typed.classList.remove('typing'), 1100);
+        })();
+      }
+    }
+
     function updateLine() {
       const r = tlx.getBoundingClientRect();               // visual px
-      const tip = window.innerHeight * 0.58;               // where the tip "is" on screen
+      const vh = window.innerHeight;
+      const tip = vh * 0.58;                               // where the tip "is" on screen
+      const R = vh * 0.42;                                 // dot reaction radius
       const filledVisual = Math.max(0, Math.min(r.height, tip - r.top));
       if (fill) fill.style.height = (filledVisual / z()) + 'px';   // layout px
+      let best = null, bestT = 0;
       for (const it of stops) {
-        const stage = it.firstElementChild || it;          // .tlx-stage (pins while the item scrolls)
-        const d = stage.getBoundingClientRect();
-        // ignition: the tip reached this stop's dot (stage centre)
-        if (!it.classList.contains('on') && d.top + d.height / 2 <= tip) it.classList.add('on');
-        // progress through the pinned hold (0→1) — drives the photo settle.
-        // Ratio of two visual-px distances, so the zoom cancels out.
-        const ir = it.getBoundingClientRect();
-        const span = ir.height - d.height;
-        const p = span > 40 ? Math.max(0, Math.min(1, (d.top - ir.top) / span)) : 1;
-        it.style.setProperty('--p', p.toFixed(3));
+        const d = it.getBoundingClientRect();
+        const mid = d.top + d.height / 2;
+        if (!it.classList.contains('on') && mid <= tip) ignite(it);
+        // proximity 0..1: the dot swells + glows as the tip nears, shrinks as it leaves
+        const t = Math.max(0, 1 - Math.abs(mid - tip) / R);
+        it.style.setProperty('--t', t.toFixed(3));
+        if (t > bestT) { bestT = t; best = it; }
+        if (it.classList.contains('near') && it !== best) it.classList.remove('near');
       }
+      // radar ping only on the stop the tip is currently visiting
+      for (const it of stops) it.classList.toggle('near', it === best && bestT > 0.55);
     }
     updateLine();
     window.addEventListener('scroll', updateLine, { passive: true });
