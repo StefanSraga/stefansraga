@@ -593,30 +593,30 @@
   // Prázdné pole = zůstane původní text z webu (fallback).
   const CMS_GROUPS = [
     { title: 'Hlavní stránka — texty', fields: [
-      { k: 'home_intro1', label: 'Úvodní odstavec 1', type: 'area', hint: 'Zelené slovo: &lt;span class="green"&gt;text&lt;/span&gt;' },
-      { k: 'home_intro2a', label: 'Úvodní odstavec 2 — první', type: 'area' },
-      { k: 'home_intro2b', label: 'Úvodní odstavec 2 — druhý', type: 'area' },
+      { k: 'home_intro1', label: 'Úvodní odstavec 1', type: 'area', green: true },
+      { k: 'home_intro2a', label: 'Úvodní odstavec 2 — první', type: 'area', green: true },
+      { k: 'home_intro2b', label: 'Úvodní odstavec 2 — druhý', type: 'area', green: true },
       { k: 'home_svc_photo_t', label: 'Služba 1 — nadpis', type: 'text' },
-      { k: 'home_svc_photo', label: 'Služba 1 — text', type: 'area' },
+      { k: 'home_svc_photo', label: 'Služba 1 — text', type: 'area', green: true },
       { k: 'home_svc_mkt_t', label: 'Služba 2 — nadpis', type: 'text' },
-      { k: 'home_svc_mkt', label: 'Služba 2 — text', type: 'area' },
+      { k: 'home_svc_mkt', label: 'Služba 2 — text', type: 'area', green: true },
       { k: 'home_svc_vid_t', label: 'Služba 3 — nadpis', type: 'text' },
-      { k: 'home_svc_vid', label: 'Služba 3 — text', type: 'area' },
+      { k: 'home_svc_vid', label: 'Služba 3 — text', type: 'area', green: true },
     ] },
     { title: 'Marketing', fields: [
-      { k: 'mkt_statement', label: 'Velký nadpis', type: 'text', hint: 'Zelené slovo: &lt;em&gt;text&lt;/em&gt;' },
-      { k: 'mkt_lede', label: 'Úvodní věta', type: 'area' },
-      { k: 'mkt_s1_n', label: 'Služba 1 — název', type: 'text' }, { k: 'mkt_s1_t', label: 'Služba 1 — text', type: 'area' },
-      { k: 'mkt_s2_n', label: 'Služba 2 — název', type: 'text' }, { k: 'mkt_s2_t', label: 'Služba 2 — text', type: 'area' },
-      { k: 'mkt_s3_n', label: 'Služba 3 — název', type: 'text' }, { k: 'mkt_s3_t', label: 'Služba 3 — text', type: 'area' },
-      { k: 'mkt_s4_n', label: 'Služba 4 — název', type: 'text' }, { k: 'mkt_s4_t', label: 'Služba 4 — text', type: 'area' },
+      { k: 'mkt_statement', label: 'Velký nadpis', type: 'text', green: 'em' },
+      { k: 'mkt_lede', label: 'Úvodní věta', type: 'area', green: true },
+      { k: 'mkt_s1_n', label: 'Služba 1 — název', type: 'text' }, { k: 'mkt_s1_t', label: 'Služba 1 — text', type: 'area', green: true },
+      { k: 'mkt_s2_n', label: 'Služba 2 — název', type: 'text' }, { k: 'mkt_s2_t', label: 'Služba 2 — text', type: 'area', green: true },
+      { k: 'mkt_s3_n', label: 'Služba 3 — název', type: 'text' }, { k: 'mkt_s3_t', label: 'Služba 3 — text', type: 'area', green: true },
+      { k: 'mkt_s4_n', label: 'Služba 4 — název', type: 'text' }, { k: 'mkt_s4_t', label: 'Služba 4 — text', type: 'area', green: true },
       { k: 'mkt_cta_t', label: 'Výzva — nadpis', type: 'text' },
-      { k: 'mkt_cta_s', label: 'Výzva — text', type: 'area' },
+      { k: 'mkt_cta_s', label: 'Výzva — text', type: 'area', green: true },
     ] },
     { title: 'O mně', fields: [
       { k: 'about_name', label: 'Jméno', type: 'text' },
       { k: 'about_subtitle', label: 'Podtitul', type: 'text' },
-      { k: 'about_bio', label: 'Bio text', type: 'area', hint: 'Zelené slovo: &lt;span class="green"&gt;text&lt;/span&gt;' },
+      { k: 'about_bio', label: 'Bio text', type: 'area', green: true },
       { k: 'about_portrait', label: 'Portrét (obrázek)', type: 'image' },
     ] },
     { title: 'Kontakt — patička (na všech stránkách)', fields: [
@@ -626,23 +626,45 @@
     ] },
   ];
 
+  // Real current page texts (static defaults) so the admin fields are pre-filled
+  // with what's actually on the site — much easier to orient than an empty box.
+  async function loadCmsDefaults() {
+    const DEF = {};
+    const pages = ['../', '../marketing/', '../about-me/'];
+    for (const p of pages) {
+      try {
+        const html = await (await fetch(p, { cache: 'no-cache' })).text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        doc.querySelectorAll('[data-cms-html],[data-cms-text],[data-cms-src],[data-cms-mail],[data-cms-tel]').forEach(el => {
+          let k;
+          if ((k = el.getAttribute('data-cms-html'))) DEF[k] = el.innerHTML.replace(/\s+/g, ' ').trim();
+          else if ((k = el.getAttribute('data-cms-src'))) DEF[k] = el.getAttribute('src') || '';
+          else if ((k = el.getAttribute('data-cms-text') || el.getAttribute('data-cms-mail') || el.getAttribute('data-cms-tel'))) DEF[k] = el.textContent.replace(/\s+/g, ' ').trim();
+        });
+      } catch (e) { /* page not reachable — field just stays empty */ }
+    }
+    return DEF;
+  }
+
   async function saveCms(k, value) {
     if (value === '') await guardCall(sb.from('settings').delete().eq('key', 'cms_' + k), 'Vráceno původní');
     else await guardCall(sb.from('settings').upsert({ key: 'cms_' + k, value }), 'Uloženo');
   }
   const cmsVal = (S, k) => { const v = S['cms_' + k]; return (v == null) ? '' : (typeof v === 'object' && 'v' in v ? v.v : v); };
 
-  function cmsSection(group, S) {
+  function cmsSection(group, S, DEF) {
     const sec = el('div', 'cms-group');
     sec.appendChild(el('h3', 'cms-group-h', esc(group.title)));
     group.fields.forEach(f => {
-      const cur = cmsVal(S, f.k);
+      const override = cmsVal(S, f.k);          // saved change (if any)
+      const def = (DEF && DEF[f.k]) || '';       // real current text from the page
       const field = el('div', 'field');
       if (f.type === 'image') {
+        const shown = override || def;
         field.innerHTML = `<label>${esc(f.label)}</label>
           <div class="media-pick">
-            <img class="preview" src="${esc(cur)}" onerror="this.style.opacity=.25">
-            <div class="media-actions"><input type="file" accept="image/*" style="font-size:13px">${cur ? ' <button type="button" class="btn btn-sm btn-danger">Vrátit původní</button>' : ''}</div>
+            <img class="preview" src="${esc(shown)}" onerror="this.style.opacity=.25">
+            <div class="media-actions"><input type="file" accept="image/*" style="font-size:13px">${override ? ' <button type="button" class="btn btn-sm btn-danger">Vrátit původní</button>' : ''}</div>
           </div>`;
         const fileIn = field.querySelector('input[type=file]');
         fileIn.onchange = async () => {
@@ -654,12 +676,25 @@
         const rb = field.querySelector('.btn-danger');
         if (rb) rb.onclick = async () => { await saveCms(f.k, ''); loadWebPanel(); };
       } else {
-        const input = f.type === 'area' ? '<textarea style="min-height:70px"></textarea>' : '<input type="text">';
-        field.innerHTML = `<label>${esc(f.label)}</label>${input}${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
+        const greenBtn = f.green ? '<button type="button" class="ed-green" title="Označ slovo a klikni">Zeleně</button>' : '';
+        const control = f.type === 'area' ? '<textarea style="min-height:72px"></textarea>' : '<input type="text">';
+        field.innerHTML = `<label>${esc(f.label)}</label>${greenBtn ? `<div class="ed-bar">${greenBtn}</div>` : ''}${control}${f.hint ? `<span class="hint">${f.hint}</span>` : ''}`;
         const ctrl = field.querySelector('textarea, input');
-        ctrl.value = cur;
-        ctrl.placeholder = '(původní text z webu)';
-        ctrl.onchange = () => saveCms(f.k, ctrl.value.trim());
+        ctrl.value = override || def;             // pre-fill with the real page text
+        // Save only a real change: if the value equals the original page text,
+        // drop the override so it stays in sync with the site's default.
+        const save = () => { const v = ctrl.value.trim(); saveCms(f.k, v === def.trim() ? '' : v); };
+        ctrl.onchange = save;
+        const gb = field.querySelector('.ed-green');
+        if (gb) gb.onclick = () => {
+          const [open, close] = f.green === 'em' ? ['<em>', '</em>'] : ['<span class="green">', '</span>'];
+          const s = ctrl.selectionStart, e = ctrl.selectionEnd;
+          const sel = ctrl.value.slice(s, e) || 'text';
+          ctrl.setRangeText(open + sel + close, s, e, 'end');
+          ctrl.focus();
+          save();
+          toast('Zvýrazněno zeleně');
+        };
       }
       sec.appendChild(field);
     });
@@ -676,13 +711,14 @@
     }
     const S = {};
     (data || []).forEach(r => { S[r.key] = r.value; });
+    const DEF = await loadCmsDefaults();   // real texts currently on the site
     panel.innerHTML = '';
 
     // ---- editable texts & images ----
-    const intro = el('p', '', 'Tady měníš texty a obrázky na webu. Prázdné pole = zůstane původní text. Ukládá se samo, jakmile klikneš mimo pole.');
+    const intro = el('p', '', 'Tady měníš texty a obrázky na webu. V políčkách je předvyplněný text, který je teď na stránce — přepiš ho. „Zeleně" zvýrazní označené slovo. Ukládá se samo, jakmile klikneš mimo pole.');
     intro.style.cssText = 'margin:0 0 18px;font-size:12.5px;color:var(--fg-dim)';
     panel.appendChild(intro);
-    CMS_GROUPS.forEach(group => panel.appendChild(cmsSection(group, S)));
+    CMS_GROUPS.forEach(group => panel.appendChild(cmsSection(group, S, DEF)));
 
     // ---- homepage videos ----
     const head = el('div', 'panel-head');
