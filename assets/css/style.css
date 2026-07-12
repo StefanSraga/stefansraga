@@ -1927,9 +1927,12 @@ article .prose img.tall {
   .about-statement { max-width: none; }
   .about-hero .about-intro .bio { max-width: none; }
   /* line moves to the left edge, everything reads on one side */
-  .tlx-track { left: 18px; transform: none; }
+  /* the line lives in .tlx coords but the dots in .tlx-item coords (items
+     start 4vw further right) — offset the track so both share one centre
+     at 4vw + 19.5px; otherwise the dots float 15px off the line */
+  .tlx-track { left: calc(4vw + 18px); transform: none; }
   .tlx-item { grid-template-columns: 1fr; gap: 18px; padding: 34px 0 34px 46px; }
-  .tlx-item::before { left: 18px; }
+  .tlx-item::before { left: 19.5px; }
   .tlx-dot { left: 19.5px; }
   .tlx-info,
   .tlx-item:nth-child(even) .tlx-info { grid-column: 1; grid-row: auto; justify-self: start; text-align: left; }
@@ -2238,8 +2241,11 @@ article .prose img.tall {
   .intro-stack .intro-row { position: static; min-height: 0; }
   /* full-bleed video keeps a real ratio before the poster loads (no CLS) */
   .fullbleed video { aspect-ratio: 16 / 9; max-height: none; height: auto; }
-  /* photos hub cards: landscape photos keep their natural ratio */
-  .card-row .media img, .card-row .media video { min-height: 0; height: auto; max-height: 340px; }
+  /* photos hub cards: landscape photos keep their natural ratio.
+     `auto 3/2` = use the width/height attrs when present, else reserve a
+     3:2 box — the media area must NEVER collapse to 0px while loading
+     (cards were visually running into each other on slow connections) */
+  .card-row .media img, .card-row .media video { min-height: 0; height: auto; max-height: 340px; aspect-ratio: auto 3 / 2; }
   /* galleries: justified text creates rivers in a ~345px column */
   .gallery-intro { text-align: left; }
   /* videos pager jump would land under the fixed header */
