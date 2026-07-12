@@ -73,3 +73,46 @@
 
   window.SR = SR;
 })();
+
+/* Head-meta updater for client-rendered content (admin-created posts/galleries
+   served via the dynamic /view templates). Google executes JS, so setting the
+   title/description/canonical/og here gets fresh content indexed properly. */
+window.SRMeta = function (o) {
+  const ensure = (selector, make) => {
+    let el = document.head.querySelector(selector);
+    if (!el) { el = make(); document.head.appendChild(el); }
+    return el;
+  };
+  const meta = (key, keyAttr, content) => {
+    if (content == null) return;
+    const el = ensure(`meta[${keyAttr}="${key}"]`, () => {
+      const m = document.createElement('meta'); m.setAttribute(keyAttr, key); return m;
+    });
+    el.setAttribute('content', content);
+  };
+  if (o.title) {
+    document.title = o.title;
+    meta('og:title', 'property', o.title);
+    meta('twitter:title', 'name', o.title);
+  }
+  if (o.desc) {
+    meta('description', 'name', o.desc);
+    meta('og:description', 'property', o.desc);
+    meta('twitter:description', 'name', o.desc);
+  }
+  if (o.image) {
+    meta('og:image', 'property', o.image);
+    meta('twitter:image', 'name', o.image);
+    // the swapped image has unknown dimensions — stale 1200×630 hints would
+    // make scrapers mis-crop the preview
+    document.head.querySelectorAll('meta[property="og:image:width"],meta[property="og:image:height"]')
+      .forEach(el => el.remove());
+  }
+  if (o.url) {
+    meta('og:url', 'property', o.url);
+    ensure('link[rel="canonical"]', () => {
+      const l = document.createElement('link'); l.setAttribute('rel', 'canonical'); return l;
+    }).setAttribute('href', o.url);
+  }
+  if (o.type) meta('og:type', 'property', o.type);
+};

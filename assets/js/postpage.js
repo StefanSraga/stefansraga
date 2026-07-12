@@ -17,7 +17,23 @@
       location.replace('/blogs/');
       return;
     }
-    document.title = p.title;
+    // full head meta (title/desc/canonical/og) — ONLY for posts served by the
+    // bare /post/view/ template (admin-created, no static file). Static pages
+    // ship hand-crafted SEO copy in their heads — never clobber it with the
+    // DB title + auto-truncated excerpt (they provably differ).
+    const isStatic = !!document.head.querySelector('link[rel="canonical"]');
+    if (!isStatic) {
+      const bodyText = String(p.body || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const metaDesc = bodyText.length > 158 ? bodyText.slice(0, 158).replace(/\s\S*$/, '') + '…' : bodyText;
+      if (window.SRMeta) window.SRMeta({
+        title: p.title + ' | Štefan Šraga',
+        desc: metaDesc,
+        image: p.cover ? new URL(p.cover, location.href).href : null,
+        url: 'https://www.stefansraga.com/post/' + encodeURI(slug) + '/',
+        type: 'article',
+      });
+      else document.title = p.title;
+    }
 
     // real view counting — once per browser session per article
     const seenKey = 'viewed:' + slug;

@@ -19,7 +19,30 @@
       location.replace('/photos/');
       return;
     }
-    document.title = g.name + ' | Štefan Šraga';
+    // full head meta — ONLY for galleries served by the bare /photos/view/
+    // template (admin-created). Static gallery pages ship hand-crafted SEO
+    // copy — never overwrite it with the plain DB name.
+    const isStatic = !!document.head.querySelector('link[rel="canonical"]');
+    if (!isStatic) {
+      const introText = String(g.intro || g.description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const gDesc = introText
+        ? (introText.length > 158 ? introText.slice(0, 158).replace(/\s\S*$/, '') + '…' : introText)
+        : g.name + ' — photo gallery by Štefan Šraga.';
+      const hero = (g.images && g.images[0] && g.images[0].url) ? new URL(g.images[0].url, location.href).href : null;
+      // legacy root galleries canonicalize to their real static URL /<slug>/
+      // (vercel.json also 301s /photos/<legacy>/ there — this is the backstop)
+      const LEGACY = ['football', 'icehockey', 'events', 'cars', 'rallypraguerevival', 'urbex', 'comicconprague'];
+      const canonPath = (segs[0] === 'photos' && !LEGACY.includes(slug))
+        ? '/photos/' + encodeURI(slug) + '/'
+        : '/' + encodeURI(slug) + '/';
+      if (window.SRMeta) window.SRMeta({
+        title: g.name + ' | Štefan Šraga',
+        desc: gDesc,
+        image: hero,
+        url: 'https://www.stefansraga.com' + canonPath,
+      });
+      else document.title = g.name + ' | Štefan Šraga';
+    }
     main.innerHTML = window.SRender.galleryBody(g);
     if (window.SRTiles) window.SRTiles(main);        // orientation-aware tile spans
     if (window.SRLightbox) window.SRLightbox(main);  // re-bind click-to-zoom

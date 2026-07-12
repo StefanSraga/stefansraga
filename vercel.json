@@ -2,6 +2,19 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/blog", "destination": "/blogs/", "permanent": true },
+    { "source": "/blog/", "destination": "/blogs/", "permanent": true },
+    { "source": "/blank", "destination": "/rallypraguerevival/", "permanent": true },
+    { "source": "/blank/", "destination": "/rallypraguerevival/", "permanent": true },
+    { "source": "/photos/football/", "destination": "/football/", "permanent": true },
+    { "source": "/photos/icehockey/", "destination": "/icehockey/", "permanent": true },
+    { "source": "/photos/events/", "destination": "/events/", "permanent": true },
+    { "source": "/photos/cars/", "destination": "/cars/", "permanent": true },
+    { "source": "/photos/rallypraguerevival/", "destination": "/rallypraguerevival/", "permanent": true },
+    { "source": "/photos/urbex/", "destination": "/urbex/", "permanent": true },
+    { "source": "/photos/comicconprague/", "destination": "/comicconprague/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/post/:slug", "destination": "/post/view" },
     { "source": "/photos/:slug", "destination": "/photos/view" }
@@ -11,6 +24,18 @@
       "source": "/admin/(.*)",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/post/view/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
+      "source": "/photos/view/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" }
       ]
     },
     {

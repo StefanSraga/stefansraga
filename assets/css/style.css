@@ -1813,6 +1813,16 @@ article .prose img.tall {
 .tlx-item.on .tlx-info,
 .tlx-item.on .tlx-media { opacity: 1; transform: none; }
 
+/* visually hidden but readable by search engines & screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* thin scroll-progress bar pinned to the very top (only on the story page) */
 .scroll-prog {
   position: fixed;
