@@ -29,6 +29,15 @@
 
 html { scroll-behavior: smooth; }
 
+/* horizontal-scroll guard: `clip` (unlike hidden) creates no scroll container,
+   so position:sticky keeps working and iOS touch-panning can't drag the page
+   sideways while below-fold reveal elements sit translated off-canvas.
+   `hidden` stays first as the fallback for older browsers. */
+html, body {
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -38,7 +47,6 @@ body {
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
 img, video { max-width: 100%; display: block; }
@@ -122,12 +130,16 @@ a { color: inherit; text-decoration: none; }
   background: none;
   border: 0;
   cursor: pointer;
-  padding: 8px;
+  padding: 12px 11px;      /* ≥44px touch target — the main mobile control */
 }
 .nav-toggle span {
   display: block; width: 22px; height: 2px; background: #fff; margin: 5px 0;
   transition: transform .25s ease, opacity .25s ease;
 }
+/* hamburger → X while the menu is open (visual state feedback) */
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 @media (max-width: 900px) {
   .nav-toggle { display: block; }
@@ -138,13 +150,19 @@ a { color: inherit; text-decoration: none; }
     flex-direction: column;
     gap: 0;
     background: #000;
-    padding: 10px 0 18px;
     transform: translateY(-130%);
-    transition: transform .3s ease;
+    /* visibility flips only AFTER the slide finishes — closed menu is then
+       unreachable for tab-focus and screen readers, but the animation stays */
+    visibility: hidden;
+    transition: transform .3s ease, visibility 0s linear .3s;
+    padding: 10px 0 18px;
   }
-  .site-nav.open { transform: translateY(0); }
+  .site-nav.open { transform: translateY(0); visibility: visible; transition: transform .3s ease; }
   .site-nav a { padding: 12px 24px; width: 100%; text-align: center; }
   .since { display: none; }
+  /* social icons keep their 18px look but get comfortable 44px hitboxes */
+  .socials { gap: 4px; }
+  .socials a { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; }
 }
 
 /* ---------- Footer ---------- */
@@ -427,6 +445,12 @@ a { color: inherit; text-decoration: none; }
 .lightbox .lb-prev:hover, .lightbox .lb-next:hover { opacity: 1; color: var(--accent); }
 .lightbox .lb-prev { left: 6px; }
 .lightbox .lb-next { right: 6px; }
+/* touch: bigger close target, arrows tucked to the edges (swipe is primary) */
+@media (max-width: 820px) {
+  .lightbox .lb-close { top: 10px; right: 10px; font-size: 30px; padding: 12px; }
+  .lightbox .lb-prev, .lightbox .lb-next { font-size: 30px; padding: 16px 10px; }
+  .lightbox img { max-width: 96vw; max-height: 86vh; }
+}
 
 /* ---------- Generic page shell ---------- */
 .page { padding-top: var(--header-h); min-height: 60vh; }
@@ -515,8 +539,8 @@ article .prose img.tall {
   border-radius: 999px;
   color: var(--fg);
   font: inherit;
-  font-size: 14px;
-  padding: 9px 20px;
+  font-size: 16px;   /* <16px would trigger iOS auto-zoom on focus */
+  padding: 11px 20px;
   min-width: min(340px, 78vw);
   outline: none;
   transition: border-color .25s ease;
@@ -895,6 +919,16 @@ article .prose img.tall {
 .intro-row.reveal .intro-text, .video-block.reveal .text { transform: translateX(-130px); }
 .intro-row.reverse.reveal .intro-media, .video-block.reverse.reveal .media { transform: translateX(-130px); }
 .intro-row.reverse.reveal .intro-text, .video-block.reverse.reveal .text { transform: translateX(130px); }
+/* mobile: horizontal entrances would push content past the viewport edge and
+   feel jumpy on a narrow single column — enter from below instead */
+@media (max-width: 820px) {
+  .card-row.reveal, .card-row.reveal.reverse { transform: translateY(40px); }
+  .intro-row.reveal .intro-media, .intro-row.reveal .intro-text,
+  .intro-row.reverse.reveal .intro-media, .intro-row.reverse.reveal .intro-text,
+  .video-block.reveal .media, .video-block.reveal .text,
+  .video-block.reverse.reveal .media, .video-block.reverse.reveal .text { transform: translateY(32px); }
+}
+
 .intro-row.reveal.visible .intro-media, .intro-row.reveal.visible .intro-text,
 .video-block.reveal.visible .media, .video-block.reveal.visible .text {
   opacity: 1;
@@ -1179,6 +1213,10 @@ article .prose img.tall {
 }
 .vid-chip:hover { border-color: var(--fg); }
 .vid-chip.active { background: var(--accent); border-color: var(--accent); color: #000; }
+/* touch: comfortable 44px targets for the category filters */
+@media (max-width: 820px) {
+  .vid-chip { min-height: 44px; padding: 10px 16px; }
+}
 
 .vid-grid {
   display: grid;
@@ -1441,6 +1479,11 @@ article .prose img.tall {
   min-height: 420px;
   object-fit: cover;
   display: block;
+}
+/* mobile: the hero was swallowing nearly the whole first screen (730/812px) —
+   cap it so the gallery content is visible without scrolling past a billboard */
+@media (max-width: 820px) {
+  .gallery-hero img { height: 44vh; min-height: 280px; }
 }
 
 .gallery-intro {
@@ -2182,3 +2225,69 @@ article .prose img.tall {
 ::-webkit-scrollbar-track { background: #0a0a0a; }
 ::-webkit-scrollbar-thumb { background: #2c2c2c; border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ============================================================
+   MOBILE POLISH — touch targets, spacing, overscroll, safe areas
+   (full mobile revision batch)
+   ============================================================ */
+@media (max-width: 820px) {
+  /* typewriter bar never leaks past the viewport */
+  .hero .typebar { overflow: hidden; }
+  .hero .typebar .tb-inner { font-size: clamp(13px, 3.6vw, 25px); }
+  /* intro rows: no sticky stacking in a single narrow column */
+  .intro-stack .intro-row { position: static; min-height: 0; }
+  /* full-bleed video keeps a real ratio before the poster loads (no CLS) */
+  .fullbleed video { aspect-ratio: 16 / 9; max-height: none; height: auto; }
+  /* photos hub cards: landscape photos keep their natural ratio */
+  .card-row .media img, .card-row .media video { min-height: 0; height: auto; max-height: 340px; }
+  /* galleries: justified text creates rivers in a ~345px column */
+  .gallery-intro { text-align: left; }
+  /* videos pager jump would land under the fixed header */
+  .videos-page { scroll-margin-top: 80px; }
+  /* micro mono labels: 9px is unreadable on a phone */
+  .intro-topmeta, .intro-botbar, .exif-ticker { font-size: 10px; }
+  /* footer: call / mail are the primary actions — real touch targets */
+  .footer-info a { display: inline-block; padding: 8px 0; }
+  .footer-legal a { display: inline-block; padding: 10px 0; }
+  .footer-legal span:first-child { display: flex; flex-wrap: wrap; gap: 0 18px; }
+}
+
+@media (max-width: 700px) {
+  /* hide the services title decorations like the section-title-bar does */
+  .services-title-bar .crop-corner, .services-title-bar .rgb-tag { display: none; }
+}
+
+@media (max-width: 560px) {
+  /* featured blog poster: compact overlay so the photo stays visible */
+  .post-card.featured .excerpt { display: none; }
+  .post-card.featured .cover:empty,
+  .post-card.featured .cover img { height: clamp(260px, 44vh, 380px); }
+  /* Poppins 300 under 15px falls apart on OLED — bump the excerpt weight */
+  .post-card .excerpt { font-weight: 400; }
+  /* marketing CTA buttons: ≥48px height and the mono e-mail fits the box */
+  .mkh-btn { padding: 16px 18px; letter-spacing: 0.12em; overflow-wrap: anywhere; }
+  /* about kicker fits one line on 360px */
+  .about-kicker { letter-spacing: 0.16em; gap: 10px; }
+  .about-kicker::before { width: 20px; }
+  .about-statement { overflow-wrap: break-word; }
+  /* timeline: "2019 — SOUČASNOST" ranges fit 360px */
+  .tlx-year { font-size: 30px; }
+}
+
+/* touch devices: hover states would stick after a tap — neutralize them */
+@media (hover: none) {
+  .card-row:hover { border-color: var(--line); box-shadow: none; }
+  .card-row:hover .media img { transform: none; }
+  .masonry a:hover img { transform: none; }
+  .vid-card:hover { border-color: rgba(255, 255, 255, 0.12); }
+  .vid-card:hover .vid-thumb img { transform: none; filter: none; }
+  .vid-card:hover .vid-play { background: rgba(0, 0, 0, 0.55); border-color: rgba(255, 255, 255, 0.35); scale: none; }
+  .vid-card:hover .vid-play svg { fill: #fff; }
+  .tlx-photo:hover { border-color: rgba(255, 255, 255, 0.10); box-shadow: none; }
+  .tlx-photo:hover img { transform: none; }
+}
+
+/* modals: contain rubber-band overscroll; bigger close targets + safe area */
+.lightbox, .vid-modal { overscroll-behavior: contain; }
+.lightbox .lb-close { padding: 12px 14px; }
+.vid-modal .vm-close { padding: 10px 14px; top: max(10px, env(safe-area-inset-top)); }

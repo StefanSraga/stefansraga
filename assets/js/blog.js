@@ -10,8 +10,15 @@
   const fold = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const plain = h => String(h || '').replace(/<[^>]+>/g, ' ');
 
+  // reserve the tools row's space SYNCHRONOUSLY — inserting it after the
+  // Supabase round-trip pushed the whole list (incl. the LCP cover) down
+  const toolsSlot = document.createElement('div');
+  toolsSlot.className = 'blog-tools';
+  toolsSlot.style.minHeight = '46px';
+  list.parentNode.insertBefore(toolsSlot, list);
+
   window.SR.getPosts().then(posts => {
-    if (!(posts && posts.length)) return;
+    if (!(posts && posts.length)) { toolsSlot.remove(); return; }
 
     let q = '';
     let tag = 'all';
@@ -29,15 +36,13 @@
       if (window.SRHud) window.SRHud(list);   // timecode + view count-ups on injected nodes
     }
 
-    // search box + tag chips (only shown when live data is available)
+    // search box + tag chips fill the pre-reserved slot (no layout shift)
     const tags = [...new Set(posts.flatMap(p => p.tags || []))];
-    const tools = document.createElement('div');
-    tools.className = 'blog-tools';
+    const tools = toolsSlot;
     tools.innerHTML = `
       <input class="blog-search" type="search" placeholder="Hledat v článcích…" aria-label="Hledat v článcích">
       ${tags.length ? `<button class="vid-chip active" data-tag="all">Vše</button>` +
         tags.map(t => `<button class="vid-chip" data-tag="${window.SRender.esc(t)}">${window.SRender.esc(t)}</button>`).join('') : ''}`;
-    list.parentNode.insertBefore(tools, list);
 
     tools.querySelector('.blog-search').addEventListener('input', e => {
       q = fold(e.target.value.trim());

@@ -27,7 +27,9 @@
       "description": "Major returned to the Cathedral of Counter-Strike. The stories this tournament created will stay with fans for a very long time. NiKo finally lifted his first Major trophy with Falcons. Magixx delivered an unbelievable 1v4 clutch. m0NESY's performance reminded everyone why he's one of the best players in the world... and I could go on. The content from this event generated over 1 million organic impressions on my Instagram, where you can also find all of the photos and videos I shared throughout the tournament.",
       "video": "assets/video/491946_ed08a9e242134ce6be6327cce400fe43.mp4",
       "poster": "assets/img/poster/491946_ed08a9e242134ce6be6327cce400fe43.jpg",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "videoHi": "assets/video/opt/491946_ed08a9e242134ce6be6327cce400fe43-hi.mp4",
+      "videoLo": "assets/video/opt/491946_ed08a9e242134ce6be6327cce400fe43-lo.mp4"
     },
     {
       "id": "clash-of-the-stars-16",
@@ -37,7 +39,9 @@
       "description": "Clash of the Stars 16 and Vašek's title fight. I'm incredibly happy about the collaboration we've built together. I filmed Vašek's entire journey throughout the tournament, and I had the first edit finished the very next day after the event. That video has already surpassed 97,000 views. Vašek won his fight and earned the championship belt—it looks absolutely incredible. Congratulations, my friend.",
       "video": "assets/video/491946_38cbb1a761ff434393be653ede613d8b.mp4",
       "poster": "assets/img/poster/491946_38cbb1a761ff434393be653ede613d8b.jpg",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "videoHi": "assets/video/opt/491946_38cbb1a761ff434393be653ede613d8b-hi.mp4",
+      "videoLo": "assets/video/opt/491946_38cbb1a761ff434393be653ede613d8b-lo.mp4"
     },
     {
       "id": "iem-krak-w-26",
@@ -47,7 +51,9 @@
       "description": "The year 2026 marked another chapter for IEM. After many long years in Katowice, this legendary tournament is moving to Kraków. As I write this—I've still got goosebumps. A new chapter is here, and I'm incredibly grateful that I was able to be part of it. Thank you very much for the accreditation, and you can already check out the first video.",
       "video": "assets/video/491946_59ca5df2ca994335963810a4df30b39d.mp4",
       "poster": "assets/img/poster/491946_59ca5df2ca994335963810a4df30b39d.jpg",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "videoHi": "assets/video/opt/491946_59ca5df2ca994335963810a4df30b39d-hi.mp4",
+      "videoLo": "assets/video/opt/491946_59ca5df2ca994335963810a4df30b39d-lo.mp4"
     },
     {
       "id": "iem-katowice-hall-of-heroes",
@@ -74,7 +80,9 @@
       "description": "After an agreement with Vašek (Baba Yaga), we decided that I would make a video for him from the Clash of the Stars 14 tournament. Take a look at a highlight video from the evening, where Vašek won his fight. Thank you, Vašek, for the opportunity — it was great, and I’m looking forward to further collaboration.",
       "video": "assets/video/491946_5af9a881fb9242159f4ec99cbac0daea.mp4",
       "poster": "assets/img/poster/491946_5af9a881fb9242159f4ec99cbac0daea.jpg",
-      "orientation": "portrait"
+      "orientation": "portrait",
+      "videoHi": "assets/video/opt/491946_5af9a881fb9242159f4ec99cbac0daea-hi.mp4",
+      "videoLo": "assets/video/opt/491946_5af9a881fb9242159f4ec99cbac0daea-lo.mp4"
     },
     {
       "id": "ramson-barber-promo-spot",

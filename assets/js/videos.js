@@ -55,6 +55,32 @@
   let page = 1;
   const PER_PAGE = parseInt(root.getAttribute('data-per-page'), 10) || 9;
 
+  // prefer the smaller rendition on slow links, data-saver AND small screens
+  // (a phone gains nothing from the 1280px encode; iOS has no connection API)
+  function wantLo() {
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (conn) {
+      const et = conn.effectiveType || '';
+      if (conn.saveData || et === 'slow-2g' || et === '2g' || et === '3g' ||
+          (typeof conn.downlink === 'number' && conn.downlink > 0 && conn.downlink < 2.5)) return true;
+    }
+    return window.matchMedia('(max-width: 820px)').matches;
+  }
+  // Candidate sources for a self-hosted entry, best first. Renditions are
+  // derived from the path convention assets/video/opt/<id>-{hi,lo}.mp4, so
+  // this works for LIVE DB rows too (they carry no videoHi/videoLo fields);
+  // a missing rendition just 404s and the <source> chain falls through to
+  // the original file.
+  function videoSources(v) {
+    const list = [];
+    const pick = wantLo() ? (v.videoLo || v.videoHi) : (v.videoHi || v.videoLo);
+    if (pick) list.push(pick);
+    const m = String(v.video || '').match(/^(.*assets\/video\/)([^\/]+)\.mp4$/i);
+    if (m && !m[2].startsWith('opt/')) list.push(`${m[1]}opt/${m[2]}-${wantLo() ? 'lo' : 'hi'}.mp4`);
+    list.push(v.video);
+    return [...new Set(list.filter(Boolean))];
+  }
+
   /* ---------- modal player ---------- */
   const modal = document.createElement('div');
   modal.className = 'vid-modal';
@@ -70,9 +96,11 @@
     const k = kind(v);
     if (k === 'youtube') {
       const id = youtubeId(v.video);
-      stage.innerHTML = `<div class="vm-16x9"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" title="${esc(v.title)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
+      // playsinline: keep playback inside the modal on iPhone (no forced fullscreen)
+      stage.innerHTML = `<div class="vm-16x9"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1" title="${esc(v.title)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div>`;
     } else if (k === 'file') {
-      stage.innerHTML = `<video src="${asset(v.video)}" poster="${posterFor(v)}" controls autoplay playsinline class="${v.orientation === 'portrait' ? 'portrait' : ''}"></video>`;
+      const srcs = videoSources(v).map(s => `<source src="${asset(s)}" type="video/mp4">`).join('');
+      stage.innerHTML = `<video poster="${posterFor(v)}" controls autoplay playsinline class="${v.orientation === 'portrait' ? 'portrait' : ''}">${srcs}</video>`;
     } else if (k === 'gallery') {
       let idx = 0;
       const imgs = v.images.map(asset);

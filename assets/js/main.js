@@ -5,7 +5,13 @@
   /* ---------- Wix-like proportional scaling ----------
      The original Wix site scales the whole design up on wide screens.
      Design width ~1440px; above that we zoom the page proportionally. */
+  let lastZoomW = 0;
   function applyZoom() {
+    // Mobile browsers fire resize when the URL bar collapses/expands during
+    // scroll — only the HEIGHT changes. Re-writing --vph then makes the hero
+    // jump mid-scroll, so on a same-width resize we keep the original value.
+    if (window.innerWidth === lastZoomW) return;
+    lastZoomW = window.innerWidth;
     const z = Math.min(Math.max(window.innerWidth / 1440, 1), 1.6);
     if ('zoom' in document.body.style) {
       document.body.style.zoom = z > 1.01 ? z : '';
@@ -23,8 +29,19 @@
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.querySelector('.site-nav');
   if (toggle && nav) {
-    toggle.addEventListener('click', () => nav.classList.toggle('open'));
-    nav.addEventListener('click', e => { if (e.target.tagName === 'A') nav.classList.remove('open'); });
+    const setNav = open => {
+      nav.classList.toggle('open', open);
+      toggle.classList.toggle('open', open);          // hamburger ↔ X
+      toggle.setAttribute('aria-expanded', open);
+    };
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.addEventListener('click', () => setNav(!nav.classList.contains('open')));
+    nav.addEventListener('click', e => { if (e.target.tagName === 'A') setNav(false); });
+    // close on Escape and on a tap anywhere outside the header
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) setNav(false); });
+    document.addEventListener('click', e => {
+      if (nav.classList.contains('open') && !e.target.closest('.site-header')) setNav(false);
+    });
   }
 
   /* ---------- Active nav link ---------- */
@@ -313,6 +330,11 @@
   function lbShow(delta) {
     lbIdx = (lbIdx + delta + lbItems.length) % lbItems.length;
     lbImg.src = lbItems[lbIdx].href;
+    // warm up the neighbours so the next swipe shows instantly (mobile 4G)
+    [1, -1].forEach(d => {
+      const n = lbItems[(lbIdx + d + lbItems.length) % lbItems.length];
+      if (n) { const pre = new Image(); pre.src = n.href; }
+    });
   }
   function initLightbox(scope) {
     const grids = (scope || document).querySelectorAll('.photo-grid, .photo-grid-lb, [data-lightbox]');
@@ -336,6 +358,18 @@
         if (e.key === 'ArrowLeft') lbShow(-1);
         if (e.key === 'ArrowRight') lbShow(1);
       });
+      // touch: swipe left/right to browse, swipe down to close
+      let tX = 0, tY = 0;
+      lb.addEventListener('touchstart', e => {
+        if (e.touches.length !== 1) return;
+        tX = e.touches[0].clientX; tY = e.touches[0].clientY;
+      }, { passive: true });
+      lb.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - tX;
+        const dy = e.changedTouches[0].clientY - tY;
+        if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) lbShow(dx < 0 ? 1 : -1);
+        else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.5) lbClose();
+      }, { passive: true });
     }
     grids.forEach(grid => {
       if (grid.hasAttribute('data-lb')) return;
@@ -362,15 +396,19 @@
         a.setAttribute('data-tile', '1');
         const img = a.querySelector('img');
         if (!img) return;
-        const place = () => {
-          if (!img.naturalWidth || !img.naturalHeight) return;
-          const ar = img.naturalWidth / img.naturalHeight;
+        const place = (w, h) => {
+          if (!w || !h) return;
+          const ar = w / h;
           if (ar < 0.85) a.classList.add('t');
           else if (ar > 1.9) a.classList.add('w');
           else if (ar > 1.15 && i % 7 === 3) a.classList.add('b');
         };
-        if (img.complete && img.naturalWidth) place();
-        else img.addEventListener('load', place, { once: true });
+        // width/height attrs (baked by the generator) let us place the tile
+        // immediately — no waiting for the image to download (no reflow)
+        const aw = parseInt(img.getAttribute('width'), 10), ah = parseInt(img.getAttribute('height'), 10);
+        if (aw && ah) place(aw, ah);
+        else if (img.complete && img.naturalWidth) place(img.naturalWidth, img.naturalHeight);
+        else img.addEventListener('load', () => place(img.naturalWidth, img.naturalHeight), { once: true });
       });
     });
   }
@@ -457,7 +495,15 @@
     }));
     function frame() { updateLine(); updateProg(); }
     frame();
-    window.addEventListener('scroll', frame, { passive: true });
+    // coalesce scroll work into one rAF per frame — 18 getBoundingClientRect
+    // calls per raw scroll event caused jank on mobile. resize + the initial
+    // call stay direct (rAF may not tick in the preview pane's compositor).
+    let tlxTick = false;
+    window.addEventListener('scroll', () => {
+      if (tlxTick) return;
+      tlxTick = true;
+      requestAnimationFrame(() => { frame(); tlxTick = false; });
+    }, { passive: true });
     window.addEventListener('resize', frame);
   }
 
@@ -501,6 +547,10 @@
       lo = !!conn.saveData || et === 'slow-2g' || et === '2g' || et === '3g' ||
            (typeof conn.downlink === 'number' && conn.downlink > 0 && conn.downlink < 2.5);
     }
+    // phones get the small encode regardless: a 375px column gains nothing
+    // from the 1280px file, and iOS Safari has no connection API at all
+    // (conn === undefined there, so this is the only signal that fires)
+    if (!lo && window.matchMedia('(max-width: 820px)').matches) lo = true;
     vids.forEach(v => {
       const url = v.getAttribute(lo ? 'data-src-lo' : 'data-src-hi') || v.getAttribute('data-src-hi');
       if (!url) return;

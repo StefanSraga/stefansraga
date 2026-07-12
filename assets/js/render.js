@@ -57,10 +57,22 @@
     </article>${relStrip}`;
   }
 
+  // 640px thumb for local gallery photos (tiles render ≤300px — the full JPG
+  // is a mobile-data killer). onerror falls back to the original, so photos
+  // without a pre-generated thumb (e.g. fresh admin uploads) still work.
+  function thumbSrc(url) {
+    const m = String(url).match(/^(.*\/assets\/img\/)([^\/]+)\.(jpe?g|webp|png)$/i);
+    return m ? `${m[1]}thumb/${m[2]}.${m[3].toLowerCase() === 'png' ? 'jpg' : m[3]}` : null;
+  }
   function galleryBody(g) {
     const imgs = (g.images || []);
-    const grid = imgs.map(im => `<a href="${esc(im.url)}"><img src="${esc(im.url)}" alt="${esc(im.alt || '')}" loading="lazy"></a>`).join('\n');
-    return `<div class="gallery-hero"><img src="${esc(g.hero)}" alt="${esc(g.name)}"></div>
+    const grid = imgs.map((im, i) => {
+      const t = thumbSrc(im.url);
+      const fallback = t ? ` onerror="this.onerror=null;this.src='${esc(im.url)}'"` : '';
+      const alt = im.alt || `${g.name} — photography by Štefan Šraga (photo ${i + 1})`;
+      return `<a href="${esc(im.url)}"><img src="${esc(t || im.url)}" alt="${esc(alt)}" loading="lazy"${fallback}></a>`;
+    }).join('\n');
+    return `<div class="gallery-hero"><img src="${esc(g.hero)}" alt="${esc(g.name)}" fetchpriority="high"></div>
       ${g.intro ? `<div class="gallery-intro reveal visible">${g.intro}</div>` : ''}
       <div class="masonry photo-grid-lb reveal visible">${grid}</div>`;
   }
