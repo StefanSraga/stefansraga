@@ -345,7 +345,7 @@ a { color: inherit; text-decoration: none; }
 .card-row.reverse { direction: rtl; }
 .card-row.reverse > * { direction: ltr; }
 
-.card-row .media { overflow: hidden; border-radius: var(--radius-media); }
+.card-row .media { overflow: hidden; border-radius: var(--radius-media); background: var(--bg-card); }
 .card-row .media img,
 .card-row .media video {
   width: 100%;
@@ -2241,11 +2241,17 @@ article .prose img.tall {
   .intro-stack .intro-row { position: static; min-height: 0; }
   /* full-bleed video keeps a real ratio before the poster loads (no CLS) */
   .fullbleed video { aspect-ratio: 16 / 9; max-height: none; height: auto; }
-  /* photos hub cards: landscape photos keep their natural ratio.
-     `auto 3/2` = use the width/height attrs when present, else reserve a
-     3:2 box — the media area must NEVER collapse to 0px while loading
-     (cards were visually running into each other on slow connections) */
-  .card-row .media img, .card-row .media video { min-height: 0; height: auto; max-height: 340px; aspect-ratio: auto 3 / 2; }
+  /* photos hub cards — one deterministic box per card. The MEDIA frame owns a
+     fixed 3:2 ratio, so its height is known before the photo loads (no empty
+     hole, no layout shift) and every card is the same size regardless of the
+     source orientation; the photo just fills it via object-fit: cover.
+     (Earlier `aspect-ratio: auto` let each loaded photo resize its own box —
+     portraits ballooned to 340px, landscapes shrank to 170px = the "broken",
+     mismatched boxes.) */
+  .card-row .media { aspect-ratio: 3 / 2; }
+  .card-row .media img, .card-row .media video {
+    min-height: 0; max-height: none; width: 100%; height: 100%; object-fit: cover;
+  }
   /* galleries: justified text creates rivers in a ~345px column */
   .gallery-intro { text-align: left; }
   /* videos pager jump would land under the fixed header */
