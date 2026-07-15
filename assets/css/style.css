@@ -922,11 +922,16 @@ article .prose img.tall {
 /* mobile: horizontal entrances would push content past the viewport edge and
    feel jumpy on a narrow single column — enter from below instead */
 @media (max-width: 820px) {
-  .card-row.reveal, .card-row.reveal.reverse { transform: translateY(40px); }
-  .intro-row.reveal .intro-media, .intro-row.reveal .intro-text,
-  .intro-row.reverse.reveal .intro-media, .intro-row.reverse.reveal .intro-text,
-  .video-block.reveal .media, .video-block.reveal .text,
-  .video-block.reverse.reveal .media, .video-block.reverse.reveal .text { transform: translateY(32px); }
+  /* entrance offset ONLY while not yet revealed. The `:not(.visible)` guard is
+     critical: the plain `.card-row.reveal.reverse` selector has the SAME
+     specificity as `.card-row.reveal.visible` and sits later in the source, so
+     without it a revealed REVERSE card kept its translateY(40px) forever —
+     leaving it shifted 40px down and overlapping the next card by ~16px. */
+  .card-row.reveal:not(.visible), .card-row.reveal.reverse:not(.visible) { transform: translateY(40px); }
+  .intro-row.reveal:not(.visible) .intro-media, .intro-row.reveal:not(.visible) .intro-text,
+  .intro-row.reverse.reveal:not(.visible) .intro-media, .intro-row.reverse.reveal:not(.visible) .intro-text,
+  .video-block.reveal:not(.visible) .media, .video-block.reveal:not(.visible) .text,
+  .video-block.reverse.reveal:not(.visible) .media, .video-block.reverse.reveal:not(.visible) .text { transform: translateY(32px); }
 }
 
 .intro-row.reveal.visible .intro-media, .intro-row.reveal.visible .intro-text,
