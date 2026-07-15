@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.stefansraga.com/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/about-me/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/blogs/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/marketing/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/photos/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/videos/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -98,7 +98,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/cars/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_d69adddab4154cf994275ad430ec9941.jpg</image:loc></image:image>
@@ -115,7 +115,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/comicconprague/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/942fb7_1b0ef05f5acb45e88659a6c4c710c09c.webp</image:loc></image:image>
@@ -130,7 +130,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/events/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_cb2d9169a434497c9a25fd9a25a40eab.jpg</image:loc></image:image>
@@ -162,7 +162,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/football/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_40efa32662e84640993fed44bb4687ff.jpg</image:loc></image:image>
@@ -189,7 +189,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/icehockey/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_ec755847da9d4d579b66150677c47dd0.jpg</image:loc></image:image>
@@ -212,7 +212,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/rallypraguerevival/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_a2dcee4e911249b0802d95e5e60a12d0.jpg</image:loc></image:image>
@@ -231,7 +231,7 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/urbex/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
     <image:image><image:loc>https://www.stefansraga.com/assets/img/491946_bce490a0ebe24656ac3e9a83eab13a11.jpg</image:loc></image:image>
@@ -252,13 +252,19 @@
   </url>
   <url>
     <loc>https://www.stefansraga.com/accessibility-statement/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.stefansraga.com/cookies/</loc>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://www.stefansraga.com/privacy-policy/</loc>
-    <lastmod>2026-07-14</lastmod>
+    <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
