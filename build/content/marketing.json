@@ -1,0 +1,164 @@
+{
+  "file": "marketing.html",
+  "title": "MARKETING | Štefan Šraga – Photo & Video Production",
+  "sections": [
+    {
+      "text": "SINCE 2015",
+      "html": "<p class=\"font_9 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">SINCE 2015</span></p>"
+    },
+    {
+      "text": "MARKETING SERVICES",
+      "html": "<h2 class=\"font_9 wixui-rich-text__text\">MARKETING SERVICES</h2>"
+    },
+    {
+      "text": "(0,1,255)",
+      "html": "<p class=\"font_9 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">(0,1,255)</span></p>"
+    },
+    {
+      "text": "SEO",
+      "html": "<p class=\"font_6 wixui-rich-text__text\">SEO</p>"
+    },
+    {
+      "text": "We can help with the integration and activation of services such as Google Analytics 4, Google Tag Manager, product comparison platforms with effective bidding, high-quality XML feeds, Mergado, and more.",
+      "html": "<p class=\"font_8 wixui-rich-text__text\"><span style=\"color:#ffffff;\" class=\"wixui-rich-text__text\"><span style=\"font-style:normal;\" class=\"wixui-rich-text__text\"><span style=\"font-family:poppins-v2,sans-serif;\" class=\"wixui-rich-text__text\"><span style=\"font-weight:400;\" class=\"wixui-rich-text__text\">We can help with the integration and activation of services such as Google Analytics 4, Google Tag Manager, product comparison platforms with effective bidding, high-quality XML feeds, Mergado, and more.</span></span></span></span></p>"
+    },
+    {
+      "text": "PPC",
+      "html": "<p class=\"font_6 wixui-rich-text__text\">PPC</p>"
+    },
+    {
+      "text": "Comprehensive strategy, in-depth analysis, and full creation of PPC campaigns. We focus on targeted advertising, smart remarketing, and efficient budget management to maximize your return on investment.",
+      "html": "<p class=\"font_8 wixui-rich-text__text\">Comprehensive strategy, in-depth analysis, and full creation of PPC campaigns. We focus on targeted advertising, smart remarketing, and efficient budget management to maximize your return on investment.</p>"
+    },
+    {
+      "text": "Data Analysis",
+      "html": "<p class=\"font_6 wixui-rich-text__text\">Data<br class=\"wixui-rich-text__text\">\nAnalysis</p>"
+    },
+    {
+      "text": "We use advanced tools like Google Analytics, Power BI, Clarity, Google Ads, and Looker Studio to analyze data, optimize performance, and improve ad efficiency while reducing costs.",
+      "html": "<p class=\"font_8 wixui-rich-text__text\">We use advanced tools like Google Analytics, Power BI, Clarity, Google Ads, and Looker Studio to analyze data, optimize performance, and improve ad efficiency while reducing costs.</p>"
+    },
+    {
+      "text": "E-mail Marketing",
+      "html": "<p class=\"font_6 wixui-rich-text__text\">E-mail<br class=\"wixui-rich-text__text\">\nMarketing</p>"
+    },
+    {
+      "text": "We create email campaigns that boost engagement, increase sales, and build loyalty through smart segmentation, personalization, and performance tracking.",
+      "html": "<p class=\"font_8 wixui-rich-text__text\">We create email campaigns that boost engagement, increase sales, and build loyalty through smart segmentation, personalization, and performance tracking.</p>"
+    },
+    {
+      "text": "SNOW BLK",
+      "html": "<p class=\"font_9 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\"><a href=\"https://www.stefansraga.com\" target=\"_self\" class=\"wixui-rich-text__text\">SNOW BLK</a></span></p>"
+    },
+    {
+      "text": "© 2035 BY SNOW BLK. BUILT ON WIX STUDIO",
+      "html": "<p class=\"font_9 wixui-rich-text__text\" style=\"text-align:left;\"><span class=\"wixui-rich-text__text\">© 2035 BY SNOW BLK. BUILT ON&nbsp;<span style=\"text-decoration:underline;\" class=\"wixui-rich-text__text\"><a href=\"https://www.wix.com/studio\" target=\"_blank\" rel=\"noreferrer noopener\" class=\"wixui-rich-text__text\">WIX STUDIO</a></span></span></p>"
+    },
+    {
+      "text": "ACCESSIBILITY STATEMENT",
+      "html": "<p class=\"font_9 wixui-rich-text__text\" style=\"text-align:left;\"><span class=\"wixui-rich-text__text\"><span style=\"text-decoration:underline;\" class=\"wixui-rich-text__text\"><a href=\"https://www.stefansraga.com/accessibility-statement\" target=\"_self\" class=\"wixui-rich-text__text\">ACCESSIBILITY STATEMENT</a></span></span></p>"
+    },
+    {
+      "text": "PRIVACY POLICY",
+      "html": "<p class=\"font_9 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\"><span style=\"text-decoration:underline;\" class=\"wixui-rich-text__text\"><a href=\"https://www.stefansraga.com/privacy-policy\" target=\"_self\" class=\"wixui-rich-text__text\">PRIVACY POLICY</a></span></span></p>"
+    },
+    {
+      "text": "SINCE 2015",
+      "html": "<p class=\"font_9 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">SINCE 2015</span></p>"
+    },
+    {
+      "text": "Made with love by Tempo Group",
+      "html": "<h2 class=\"font_2 wixui-rich-text__text\">Made with love by <span style=\"text-decoration:underline;\" class=\"wixui-rich-text__text\"><a href=\"http://tempovis.co\" target=\"_blank\" rel=\"noreferrer noopener\" class=\"wixui-rich-text__text\">Tempo Group</a></span></h2>"
+    },
+    {
+      "text": "© Štefan Šraga",
+      "html": "<h2 class=\"font_2 wixui-rich-text__text\"><span class=\"wixui-rich-text__text\">© Štefan Šraga</span></h2>"
+    }
+  ],
+  "images": [
+    {
+      "id": "942fb7_f440d18845994b398622711be15ec0db~mv2.png",
+      "alt": "nove_logo_stefana_green.png"
+    },
+    {
+      "id": "88e2fc_7b724b3ad28e46ef8f7f7c96d2498540~mv2.png",
+      "alt": "sipka_levo.png"
+    },
+    {
+      "id": "88e2fc_308344208409456f95b3ec1d0d490767~mv2.png",
+      "alt": "sipka_levo_edited.png"
+    }
+  ],
+  "videos": [],
+  "iframes": [],
+  "links": [
+    {
+      "href": "https://www.stefansraga.com",
+      "text": "HOME"
+    },
+    {
+      "href": "https://www.stefansraga.com/photos",
+      "text": "PHOTOS"
+    },
+    {
+      "href": "https://www.stefansraga.com/videos",
+      "text": "VIDEOS"
+    },
+    {
+      "href": "https://www.stefansraga.com/marketing",
+      "text": "MARKETING"
+    },
+    {
+      "href": "https://www.stefansraga.com/blogs",
+      "text": "BLOG"
+    },
+    {
+      "href": "https://www.stefansraga.com/about-me",
+      "text": "ABOUT ME"
+    },
+    {
+      "href": "https://www.linkedin.com/in/stefansraga/?originalSubdomain=cz",
+      "text": "Like"
+    },
+    {
+      "href": "https://www.stefansraga.com",
+      "text": ""
+    },
+    {
+      "href": "http://linkedin.com/in/stefansraga/",
+      "text": "Like"
+    },
+    {
+      "href": "https://www.stefansraga.com",
+      "text": "SNOW BLK"
+    },
+    {
+      "href": "https://www.stefansraga.com",
+      "text": "#comp-lylaebv0_r_comp-lymyisu3 svg [data-color=\"1\"] {fill: #FFFFFF;}"
+    },
+    {
+      "href": "https://www.wix.com/studio",
+      "text": "WIX STUDIO"
+    },
+    {
+      "href": "https://www.stefansraga.com/accessibility-statement",
+      "text": "ACCESSIBILITY STATEMENT"
+    },
+    {
+      "href": "https://www.stefansraga.com/privacy-policy",
+      "text": "PRIVACY POLICY"
+    },
+    {
+      "href": "http://tempovis.co",
+      "text": "Tempo Group"
+    },
+    {
+      "href": "https://www.instagram.com/sraga.s",
+      "text": "Like"
+    }
+  ],
+  "meta": {
+    "description": "Marketing built on visuals and data. PPC, SEO, email and analytics working together to drive measurable brand results. By Štefan Sraga.",
+    "ogImage": ""
+  }
+}

@@ -1,0 +1,129 @@
+{
+ "pages": {
+  "/": {
+   "title": "Štefan Šraga | Photographer & Creative Marketer, Most",
+   "description": "Photo and video creator and marketing strategist from Most, Czech Republic. Esports, sports and event coverage plus brand campaigns since 2015."
+  },
+  "/photos/": {
+   "title": "Photo Galleries — Esports, Sports & More | Štefan Šraga",
+   "description": "Eight photo galleries in one place: esports majors, football, ice hockey, live events, cars, Rally Prague Revival, urbex and Comic-Con Prague."
+  },
+  "/videos/": {
+   "title": "Video Production & Esports Aftermovies | Štefan Šraga",
+   "description": "Video portfolio of esports aftermovies, event films and commercial promo spots — including an Intel Extreme Masters video with over 100,000 views."
+  },
+  "/marketing/": {
+   "title": "Marketing Services — SEO, PPC, Email | Štefan Šraga",
+   "description": "Digital marketing from idea to launch: SEO and analytics setup, PPC campaigns, data analysis, email marketing, branding and websites built to convert."
+  },
+  "/about-me/": {
+   "title": "About Me — From Game Retail to Esports | Štefan Šraga",
+   "description": "The story of Štefan Šraga: from game retail in 2015 to E3 accreditation, founding Nessus Gaming, partnering with FK Teplice and going self-employed."
+  },
+  "/blogs/": {
+   "title": "Blog — Esports Events, Tech & Photography | Štefan Šraga",
+   "description": "Reports from IEM Katowice, Gamescom, LoL Worlds and E3, plus Apple gear reviews — all written from behind the camera, with some posts in Czech."
+  },
+  "/football/": {
+   "title": "Football Photography — FK Teplice | Štefan Šraga",
+   "description": "Matchday photography from the pitch: FK Teplice in action, tackles, saves and celebrations — the emotion and rhythm of football, frame by frame."
+  },
+  "/icehockey/": {
+   "title": "Ice Hockey Photography | Štefan Šraga",
+   "description": "Ice hockey photo gallery built on speed, precision and heart — carving skates, flying pucks and the split seconds that decide games under arena lights."
+  },
+  "/events/": {
+   "title": "Event Photography — E3, Gamescom, ESL | Štefan Šraga",
+   "description": "Event photo gallery from E3 in Los Angeles, Gamescom in Cologne, ESL tournaments and LoL Worlds — crowds, stages and atmosphere from the front row."
+  },
+  "/cars/": {
+   "title": "Car Photography — Power & Performance | Štefan Šraga",
+   "description": "Automotive photo gallery where design meets engineering: light tracing curves and bodywork, motion blur and speed paused in a single sharp frame."
+  },
+  "/rallypraguerevival/": {
+   "title": "Rally Prague Revival — Photo Report | Štefan Šraga",
+   "description": "Photo report from Rallye Prague Revival: classic rally cars with real character, fuel fumes, dust, puddles and mud — motorsport history back on stage."
+  },
+  "/urbex/": {
+   "title": "Urbex Photography — Abandoned Places | Štefan Šraga",
+   "description": "Urbex photo gallery of abandoned places frozen in time: peeling paint, shattered glass and empty halls slowly being reclaimed by nature and silence."
+  },
+  "/comicconprague/": {
+   "title": "Comic-Con Prague 2024 — Photo Report | Štefan Šraga",
+   "description": "Photo report from Comic-Con Prague 2024: cosplayers from Ghost to Jack Sparrow and the best moments of the Czech celebration of games and movies."
+  },
+  "/accessibility-statement/": {
+   "title": "Accessibility Statement | Štefan Šraga",
+   "description": "Accessibility statement for stefansraga.com: how the site works with assistive technologies and where to send feedback if something is hard to use."
+  },
+  "/privacy-policy/": {
+   "title": "Privacy Policy | Štefan Šraga",
+   "description": "How stefansraga.com handles personal data: what we collect, why we use it, how cookies and analytics work, and the rights you have over your data."
+  },
+  "/photos/view/": {
+   "title": "Photo Gallery Viewer | Štefan Šraga",
+   "description": "Browse full-size photo sets by Štefan Šraga — complete galleries from esports arenas, sports matches, events and shoots in one continuous view."
+  }
+ },
+ "posts": {
+  "macbookm5max": {
+   "title": "From M2 Pro to M5 Pro Max: Worth the Upgrade? | Štefan Šraga",
+   "description": "A photo and video pro weighs upgrading from the MacBook Pro M2 Pro to the new M5 Pro Max: render speed, workflow gains and when the jump really pays off.",
+   "lang": "en"
+  },
+  "intel-extreme-masters-2025-counter-strike-katowice": {
+   "title": "Intel Extreme Masters 2025: CS in Katowice | Štefan Šraga",
+   "description": "Covering IEM Katowice 2025 with media accreditation for the first time: Sony A7S III in hand, a recap video past 120,000 views and Vitality winning 3-0.",
+   "lang": "en"
+  },
+  "worlds-2024-league-of-legends-londýn-the-o2-aréna-1": {
+   "title": "Worlds 2024 Finals in London, The O2 Arena | Štefan Šraga",
+   "description": "Report from the League of Legends Worlds 2024 finals at The O2 in London: Linkin Park live, synced LED wristbands and T1 beating Bilibili Gaming 3-2.",
+   "lang": "en"
+  },
+  "gamescom-největší-herní-veletrh-v-evropě-kolín-nad-rýnem": {
+   "title": "Gamescom: The Biggest Gaming Fair in Europe | Štefan Šraga",
+   "description": "Six visits to Gamescom in Cologne condensed into one guide: queues, giveaways, cosplay, merch halls and how accreditation changes the whole experience.",
+   "lang": "en"
+  },
+  "e3-expo-2018-los-angeles-usa": {
+   "title": "E3 Expo 2018 Los Angeles: A Dream Come True | Štefan Šraga",
+   "description": "First trip to the USA for E3 2018 in Los Angeles: the Xbox show at the Microsoft Theater, EA Play, LA sights and the last E3 with PlayStation on stage.",
+   "lang": "en"
+  },
+  "intel-extreme-masters-2022-katowice": {
+   "title": "Intel Extreme Masters 2022 Katowice | Štefan Šraga",
+   "description": "Back in the Spodek Arena for IEM Katowice 2022: a guest pass, NAVI, G2 and FaZe on stage, and a heartbreaking 3-0 finals loss for G2 against FaZe Clan.",
+   "lang": "en"
+  },
+  "esl-one-2019-kolín-nad-rýnem": {
+   "title": "ESL One Cologne 2019: Backstage at Lanxess | Štefan Šraga",
+   "description": "Guest at ESL One Cologne 2019 in a packed Lanxess Arena: a backstage tour of the production, the best CS teams in the world and Team Liquid lifting the trophy.",
+   "lang": "en"
+  },
+  "apple-studio-display-recenze-produktu": {
+   "title": "Apple Studio Display Review After 6 Months | Štefan Šraga",
+   "description": "Six months with the Apple Studio Display: Delta E under 1, the VESA mount option, gaming limits and who should rather save money on a regular monitor.",
+   "lang": "en"
+  },
+  "hc-sparta-praha-vs-hc-dynamo-pardubice-02-arena-praha": {
+   "title": "Shooting HC Sparta vs Pardubice at O2 Arena | Štefan Šraga",
+   "description": "Ice hockey photography from behind the plexiglass: accredited at the O2 Arena for HC Sparta Praha vs Dynamo Pardubice, a goal-filled game and a shootout.",
+   "lang": "en"
+  },
+  "proč-zrovna-apple-produkty-které-mou-práci-ovlivňují-každý-den": {
+   "title": "Why Apple? Products That Shape My Work Daily | Štefan Šraga",
+   "description": "Why a photographer and marketer works only on Apple: MacBook Pro rendering speed, one ecosystem across iPad, Watch and AirPods, and where it falls short.",
+   "lang": "en"
+  }
+ },
+ "jsonld": {
+  "home": "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"WebSite\",\"@id\":\"https://www.stefansraga.com/#website\",\"url\":\"https://www.stefansraga.com/\",\"name\":\"Štefan Šraga\",\"alternateName\":\"Stefan Sraga\",\"inLanguage\":\"en\",\"publisher\":{\"@id\":\"https://www.stefansraga.com/#person\"}},{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\",\"alternateName\":\"Stefan Sraga\",\"jobTitle\":\"Photographer & Creative Marketer\",\"url\":\"https://www.stefansraga.com/about-me/\",\"image\":\"https://www.stefansraga.com/assets/img/942fb7_7ef2a323100d40eab72d39866cbb0491.jpg\",\"sameAs\":[\"https://www.linkedin.com/in/stefansraga/\",\"https://www.instagram.com/sraga.s/\"]},{\"@type\":\"ProfessionalService\",\"@id\":\"https://www.stefansraga.com/#business\",\"name\":\"Štefan Šraga — Photography, Video & Creative Marketing\",\"description\":\"Photo and video production and marketing from Most, Czech Republic — esports, sports and event coverage, email campaigns, branding and web builds.\",\"url\":\"https://www.stefansraga.com/\",\"image\":\"https://www.stefansraga.com/assets/img/og-cover.jpg\",\"logo\":\"https://www.stefansraga.com/assets/img/942fb7_f440d18845994b398622711be15ec0db.png\",\"telephone\":\"+420 737 419 707\",\"email\":\"info@stefansraga.cz\",\"address\":{\"@type\":\"PostalAddress\",\"streetAddress\":\"Petra Jilemnického 2451/2\",\"addressLocality\":\"Most\",\"postalCode\":\"434 01\",\"addressCountry\":\"CZ\"},\"founder\":{\"@id\":\"https://www.stefansraga.com/#person\"},\"areaServed\":\"Czech Republic\",\"priceRange\":\"$$\"}]}",
+  "about": "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\",\"alternateName\":\"Stefan Sraga\",\"jobTitle\":\"Photographer & Creative Marketer\",\"description\":\"Photographer and creative marketer from Most, Czech Republic. Since 2015 shooting esports at IEM and ESL One, football, ice hockey, events and rally.\",\"url\":\"https://www.stefansraga.com/about-me/\",\"mainEntityOfPage\":\"https://www.stefansraga.com/about-me/\",\"image\":\"https://www.stefansraga.com/assets/img/942fb7_7ef2a323100d40eab72d39866cbb0491.jpg\",\"email\":\"info@stefansraga.cz\",\"telephone\":\"+420 737 419 707\",\"address\":{\"@type\":\"PostalAddress\",\"addressLocality\":\"Most\",\"addressCountry\":\"CZ\"},\"sameAs\":[\"https://www.linkedin.com/in/stefansraga/\",\"https://www.instagram.com/sraga.s/\"],\"knowsAbout\":[\"Esports photography\",\"Sports photography\",\"Event photography\",\"Video production\",\"Digital marketing\"],\"worksFor\":{\"@type\":\"ProfessionalService\",\"@id\":\"https://www.stefansraga.com/#business\",\"name\":\"Štefan Šraga — Photography, Video & Creative Marketing\"}},{\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://www.stefansraga.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"About Me\",\"item\":\"https://www.stefansraga.com/about-me/\"}]}]}",
+  "postTemplate": "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"BlogPosting\",\"@id\":\"__URL__#post\",\"headline\":\"__TITLE__\",\"description\":\"__DESC__\",\"image\":\"__IMAGE__\",\"url\":\"__URL__\",\"datePublished\":\"__DATE_ISO__\",\"dateModified\":\"__DATE_ISO__\",\"inLanguage\":\"__LANG__\",\"author\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\",\"url\":\"https://www.stefansraga.com/about-me/\"},\"publisher\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"},\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"__URL__\"},\"isPartOf\":{\"@type\":\"Blog\",\"@id\":\"https://www.stefansraga.com/blogs/#blog\"}},{\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://www.stefansraga.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Blog\",\"item\":\"https://www.stefansraga.com/blogs/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"__TITLE__\",\"item\":\"__URL__\"}]}]}",
+  "blogsIndex": "{\"@context\":\"https://schema.org\",\"@type\":\"Blog\",\"@id\":\"https://www.stefansraga.com/blogs/#blog\",\"name\":\"Blog — Štefan Šraga\",\"url\":\"https://www.stefansraga.com/blogs/\",\"description\":\"Stories from behind the camera — esports events, gaming expos, tech gear and marketing notes by Štefan Šraga. Blog posts in English and Czech.\",\"inLanguage\":[\"en\",\"cs\"],\"author\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"},\"publisher\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"}}",
+  "photosHub": "{\"@context\":\"https://schema.org\",\"@type\":\"CollectionPage\",\"@id\":\"https://www.stefansraga.com/photos/\",\"name\":\"Photography Portfolio — Štefan Šraga\",\"url\":\"https://www.stefansraga.com/photos/\",\"description\":\"Photo portfolio of Štefan Šraga — esports arenas from IEM and ESL One, football at FK Teplice, ice hockey, events, cars, rally and urbex galleries.\",\"inLanguage\":\"en\",\"about\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"},\"isPartOf\":{\"@type\":\"WebSite\",\"@id\":\"https://www.stefansraga.com/#website\",\"name\":\"Štefan Šraga\",\"url\":\"https://www.stefansraga.com/\"}}",
+  "galleryTemplate": "{\"@context\":\"https://schema.org\",\"@type\":\"ImageGallery\",\"name\":\"__NAME__\",\"description\":\"__DESC__\",\"url\":\"__URL__\",\"image\":\"__IMAGE__\",\"inLanguage\":\"en\",\"author\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"},\"isPartOf\":{\"@type\":\"CollectionPage\",\"@id\":\"https://www.stefansraga.com/photos/\"}}",
+  "videos": "{\"@context\":\"https://schema.org\",\"@type\":\"CollectionPage\",\"@id\":\"https://www.stefansraga.com/videos/\",\"name\":\"Video Portfolio — Štefan Šraga\",\"url\":\"https://www.stefansraga.com/videos/\",\"description\":\"Video portfolio of Štefan Šraga — video production for events, esports and brands, filmed at arenas and expos in the Czech Republic and abroad.\",\"inLanguage\":\"en\",\"about\":{\"@type\":\"Person\",\"@id\":\"https://www.stefansraga.com/#person\",\"name\":\"Štefan Šraga\"},\"isPartOf\":{\"@type\":\"WebSite\",\"@id\":\"https://www.stefansraga.com/#website\",\"name\":\"Štefan Šraga\",\"url\":\"https://www.stefansraga.com/\"}}"
+ }
+}

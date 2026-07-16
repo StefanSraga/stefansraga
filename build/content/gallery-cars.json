@@ -1,0 +1,94 @@
+{
+  "url": "/cars",
+  "sections": [
+    {
+      "i": 0,
+      "heading": "",
+      "paras": [
+        "SINCE 2015"
+      ],
+      "images": [
+        {
+          "id": "942fb7_f440d18845994b398622711be15ec0db~mv2.png",
+          "alt": "nove_logo_stefana_green.png"
+        }
+      ]
+    },
+    {
+      "i": 1,
+      "heading": "",
+      "paras": [],
+      "images": [
+        {
+          "id": "491946_d69adddab4154cf994275ad430ec9941~mv2.jpg",
+          "alt": "DSC08096.jpg"
+        }
+      ]
+    },
+    {
+      "i": 2,
+      "heading": "In every reflection, curve, and blur of motion lies a story of speed — paused in a single frame. This portfolio captures the soul of machines, the tension between movement and stillness, where energy meets silence. It’s a celebration of design and momentum — a moment where power, beauty, and stillness become one.",
+      "paras": [],
+      "images": []
+    },
+    {
+      "i": 3,
+      "heading": "",
+      "paras": [],
+      "images": [
+        {
+          "id": "491946_d0c2f009b6be41a7a4344414b9578806~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_ecefdeee3da9497e8dbf86bbf88cd96e~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_b1f379e4c97e49eba1d516cee3e321cc~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_68ec15fc658f42a8a4ff683746b094cb~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_83666707fd3e4aae9a776c971f37a53c~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_748ea14b79ab45faa369e70cc50844fd~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_96cde1af5ca44ebf91718c5e11c52473~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_5e08d4d488ae4c748c936434e84a6865~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_70b4d1dcf1d449abb240560e22ba5357~mv2.jpg",
+          "alt": ""
+        },
+        {
+          "id": "491946_f92b14436bfb40b7a06ede0b2de94ee1~mv2.jpg",
+          "alt": ""
+        }
+      ]
+    },
+    {
+      "i": 5,
+      "heading": "Made with love by Tempo Group",
+      "paras": [
+        "SNOW BLK",
+        "© 2035 BY SNOW BLK. BUILT ON WIX STUDIO",
+        "ACCESSIBILITY STATEMENT",
+        "PRIVACY POLICY",
+        "SINCE 2015"
+      ],
+      "images": []
+    }
+  ]
+}

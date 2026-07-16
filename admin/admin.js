@@ -818,9 +818,189 @@
   }
 
   /* ============================================================
+     SEO PANEL
+     The owner edits the Google title/description + share image for every page.
+     Values are stored in `settings` as cms_seo_<id>_{title,desc,og}; the build
+     (build/fetch-seo.js → generate-site.js) bakes them into the static HTML —
+     that is what makes them work for Google AND for social share previews,
+     which never run JavaScript. Hence the explicit "Publish" step.
+     ============================================================ */
+  const SEO_PAGES_CFG = [
+    { id: 'home', label: 'Domů', url: '../' },
+    { id: 'photos', label: 'Fotky', url: '../photos/' },
+    { id: 'videos', label: 'Videa', url: '../videos/' },
+    { id: 'marketing', label: 'Marketing', url: '../marketing/' },
+    { id: 'about-me', label: 'O mně', url: '../about-me/' },
+    { id: 'blogs', label: 'Blog', url: '../blogs/' },
+    { id: 'football', label: 'Galerie — Fotbal', url: '../football/' },
+    { id: 'icehockey', label: 'Galerie — Hokej', url: '../icehockey/' },
+    { id: 'events', label: 'Galerie — Eventy', url: '../events/' },
+    { id: 'cars', label: 'Galerie — Auta', url: '../cars/' },
+    { id: 'rallypraguerevival', label: 'Galerie — Rally', url: '../rallypraguerevival/' },
+    { id: 'urbex', label: 'Galerie — Urbex', url: '../urbex/' },
+    { id: 'comicconprague', label: 'Galerie — Comic-Con', url: '../comicconprague/' },
+  ];
+  const SEO_LIMITS = { title: 60, desc: 160 };
+
+  // read what is CURRENTLY live on each page, so empty fields show the real text
+  async function loadSeoDefaults() {
+    const DEF = {};
+    await Promise.all(SEO_PAGES_CFG.map(async p => {
+      try {
+        const html = await (await fetch(p.url, { cache: 'no-cache' })).text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        DEF[p.id] = {
+          title: (doc.querySelector('title') || {}).textContent || '',
+          desc: (doc.querySelector('meta[name="description"]') || { getAttribute: () => '' }).getAttribute('content') || '',
+          og: (doc.querySelector('meta[property="og:image"]') || { getAttribute: () => '' }).getAttribute('content') || '',
+        };
+      } catch (e) { DEF[p.id] = { title: '', desc: '', og: '' }; }
+    }));
+    return DEF;
+  }
+
+  function seoField(page, kind, S, DEF, onDirty) {
+    const key = `seo_${page.id}_${kind}`;
+    const override = cmsVal(S, key);
+    const def = (DEF[page.id] && DEF[page.id][kind]) || '';
+    const wrap = el('div', 'field');
+    const isTitle = kind === 'title';
+    const limit = SEO_LIMITS[kind];
+    wrap.innerHTML = `<label>${isTitle ? 'Titulek (co je vidět v Googlu)' : 'Popisek pod titulkem'}</label>
+      ${isTitle ? '<input type="text">' : '<textarea style="min-height:64px"></textarea>'}
+      <span class="hint seo-count"></span>`;
+    const ctrl = wrap.querySelector('input, textarea');
+    ctrl.value = override || def;
+    const count = wrap.querySelector('.seo-count');
+    const paint = () => {
+      const n = ctrl.value.trim().length;
+      const over = n > limit;
+      count.textContent = `${n} / ${limit} znaků${over ? ' — moc dlouhé, Google to ořízne' : ''}`;
+      count.style.color = over ? '#ff6b6b' : 'var(--fg-dim)';
+    };
+    paint();
+    ctrl.oninput = () => { paint(); onDirty(page.id, kind, ctrl.value.trim()); };
+    ctrl.onchange = () => saveCms(key, ctrl.value.trim() === def.trim() ? '' : ctrl.value.trim());
+    return { wrap, ctrl };
+  }
+
+  async function loadSeoPanel() {
+    const panel = $('[data-panel="seo"]');
+    panel.innerHTML = '<p class="empty-hint">Načítám…</p>';
+    const { data, error } = await sb.from('settings').select('*');
+    if (error) {
+      panel.innerHTML = '<div class="empty-hint">Tabulka nastavení zatím neexistuje.<br>Spusť v Supabase → SQL Editor <code>supabase/schema.sql</code> a obnov stránku.</div>';
+      return;
+    }
+    const S = {};
+    (data || []).forEach(r => { S[r.key] = r.value; });
+    const DEF = await loadSeoDefaults();
+    panel.innerHTML = '';
+
+    const intro = el('p', '', 'Tady si nastavíš, co o tvých stránkách ukazuje Google a co vyskočí při sdílení na Facebooku nebo WhatsAppu. V polích je předvyplněné to, co je na webu teď — přepiš to. Ukládá se samo. Až budeš hotový, klikni dole na „Publikovat na web“.');
+    intro.style.cssText = 'margin:0 0 18px;font-size:12.5px;color:var(--fg-dim);max-width:70ch';
+    panel.appendChild(intro);
+
+    // live Google-style preview so the owner sees the result, not just fields
+    const live = {};
+    const onDirty = (id, kind, val) => { (live[id] = live[id] || {})[kind] = val; repaint(id); };
+    const previews = {};
+    const repaint = id => {
+      const p = previews[id]; if (!p) return;
+      const t = (live[id] && live[id].title) || cmsVal(S, `seo_${id}_title`) || (DEF[id] || {}).title || '';
+      const d = (live[id] && live[id].desc) || cmsVal(S, `seo_${id}_desc`) || (DEF[id] || {}).desc || '';
+      p.t.textContent = t.length > 60 ? t.slice(0, 60) + '…' : t;
+      p.d.textContent = d.length > 160 ? d.slice(0, 160) + '…' : d;
+    };
+
+    SEO_PAGES_CFG.forEach(page => {
+      const sec = el('div', 'cms-group');
+      sec.appendChild(el('h3', 'cms-group-h', esc(page.label)));
+
+      const prev = el('div', 'seo-preview');
+      prev.innerHTML = `<span class="seo-prev-url">stefansraga.com${page.id === 'home' ? '' : '/' + page.id}</span>
+        <span class="seo-prev-title"></span><span class="seo-prev-desc"></span>`;
+      previews[page.id] = { t: prev.querySelector('.seo-prev-title'), d: prev.querySelector('.seo-prev-desc') };
+      sec.appendChild(prev);
+
+      sec.appendChild(seoField(page, 'title', S, DEF, onDirty).wrap);
+      sec.appendChild(seoField(page, 'desc', S, DEF, onDirty).wrap);
+
+      // share image
+      const ogKey = `seo_${page.id}_og`;
+      const ogOverride = cmsVal(S, ogKey);
+      const ogShown = ogOverride || (DEF[page.id] || {}).og || '';
+      const ogField = el('div', 'field');
+      ogField.innerHTML = `<label>Obrázek pro sdílení (Facebook, WhatsApp…)</label>
+        <div class="media-pick">
+          <img class="preview" src="${esc(ogShown)}" onerror="this.style.opacity=.25">
+          <div class="media-actions"><input type="file" accept="image/*" style="font-size:13px">${ogOverride ? ' <button type="button" class="btn btn-sm btn-danger">Vrátit původní</button>' : ''}</div>
+        </div>
+        <span class="hint">Ideálně na šířku, cca 1200×630 px.</span>`;
+      const fileIn = ogField.querySelector('input[type=file]');
+      fileIn.onchange = async () => {
+        if (!fileIn.files[0]) return;
+        toast('Nahrávám obrázek…');
+        try { const url = await uploadImage(fileIn.files[0], 'seo'); await saveCms(ogKey, url); loadSeoPanel(); }
+        catch (e) { toast(e.message, true); }
+      };
+      const rb = ogField.querySelector('.btn-danger');
+      if (rb) rb.onclick = async () => { await saveCms(ogKey, ''); loadSeoPanel(); };
+      sec.appendChild(ogField);
+
+      panel.appendChild(sec);
+      repaint(page.id);
+    });
+
+    panel.appendChild(publishBox(S));
+  }
+
+  /* ---- Publish: SEO lives in the HTML, so it needs a rebuild to go live ---- */
+  function publishBox(S) {
+    const box = el('div', 'cms-group');
+    box.appendChild(el('h3', 'cms-group-h', 'Publikovat na web'));
+    const hookKey = 'seo_deploy_hook';
+    const hook = cmsVal(S, hookKey);
+    const note = el('p', '', hook
+      ? 'Změny se ukládají průběžně, ale na web se propíšou až po publikování. Klikni na tlačítko a asi za minutu je to venku.'
+      : 'Aby tlačítko fungovalo, vlož sem jednou odkaz „Deploy Hook“ z Vercelu (Settings → Git → Deploy Hooks → Create Hook). Stačí jednou a je to.');
+    note.style.cssText = 'margin:0 0 12px;font-size:12.5px;color:var(--fg-dim);max-width:70ch';
+    box.appendChild(note);
+
+    const hookField = el('div', 'field');
+    hookField.innerHTML = `<label>Deploy Hook odkaz z Vercelu</label><input type="text" placeholder="https://api.vercel.com/v1/integrations/deploy/...">`;
+    const hookIn = hookField.querySelector('input');
+    hookIn.value = hook || '';
+    hookIn.onchange = async () => { await saveCms(hookKey, hookIn.value.trim()); loadSeoPanel(); };
+    box.appendChild(hookField);
+
+    const btn = el('button', 'btn btn-primary', 'Publikovat na web');
+    btn.style.cssText = 'margin-top:6px';
+    btn.disabled = !hook;
+    const status = el('p', '');
+    status.style.cssText = 'margin:10px 0 0;font-size:12.5px;color:var(--fg-dim)';
+    btn.onclick = async () => {
+      btn.disabled = true;
+      status.textContent = 'Publikuji…';
+      try {
+        await fetch(hook, { method: 'POST' });
+        status.textContent = '✅ Odesláno! Web se teď přestavuje — za cca minutu obnov stránku a změny tam budou.';
+        status.style.color = 'var(--accent)';
+      } catch (e) {
+        status.textContent = '❌ Nepovedlo se odeslat. Zkontroluj Deploy Hook odkaz.';
+        status.style.color = '#ff6b6b';
+      }
+      setTimeout(() => { btn.disabled = false; }, 4000);
+    };
+    box.appendChild(btn);
+    box.appendChild(status);
+    return box;
+  }
+
+  /* ============================================================
      TABS + AUTH
      ============================================================ */
-  const loaders = { videos: loadVideosPanel, posts: loadPostsPanel, galleries: loadGalleriesPanel, web: loadWebPanel };
+  const loaders = { videos: loadVideosPanel, posts: loadPostsPanel, galleries: loadGalleriesPanel, web: loadWebPanel, seo: loadSeoPanel };
   document.querySelectorAll('.adm-tab').forEach(tab => {
     tab.onclick = () => {
       document.querySelectorAll('.adm-tab').forEach(t => t.classList.toggle('active', t === tab));
