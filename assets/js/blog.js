@@ -32,7 +32,7 @@
       });
       list.innerHTML = hit.length
         ? hit.map(window.SRender.postCard).join('\n')
-        : '<p class="blog-empty mono">Nic nenalezeno.</p>';
+        : '<p class="blog-empty mono">No results found.</p>';
       if (window.SRHud) window.SRHud(list);   // timecode + view count-ups on injected nodes
     }
 
@@ -40,8 +40,8 @@
     const tags = [...new Set(posts.flatMap(p => p.tags || []))];
     const tools = toolsSlot;
     tools.innerHTML = `
-      <input class="blog-search" type="search" placeholder="Hledat v článcích…" aria-label="Hledat v článcích">
-      ${tags.length ? `<button class="vid-chip active" data-tag="all">Vše</button>` +
+      <input class="blog-search" type="search" placeholder="Search articles…" aria-label="Search articles">
+      ${tags.length ? `<button class="vid-chip active" data-tag="all">All</button>` +
         tags.map(t => `<button class="vid-chip" data-tag="${window.SRender.esc(t)}">${window.SRender.esc(t)}</button>`).join('') : ''}`;
 
     tools.querySelector('.blog-search').addEventListener('input', e => {

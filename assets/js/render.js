@@ -13,7 +13,7 @@
     const featured = i === 0;
     const wide = !featured && p.layout === 'wide';   // owner-chosen rectangular card
     const excerpt = (p.excerpt && p.excerpt.trim()) || plain(p.body).slice(0, 190);
-    const rt = (p.read_time || '').trim();
+    const rt = String(p.read_time || '').replace(/Minut\s*čten[íi]\s*:\s*(\d+)/i, '$1 min read').trim();
     const views = parseInt(p.views, 10) || 0;
     // meta: guarded so nothing dangles when read_time is missing
     const meta = featured
@@ -25,7 +25,7 @@
         ${meta}
         <h2>${esc(p.title)}${featured ? ' <span class="glitch">&#9646;&#9642;</span>' : ''}</h2>
         <p class="excerpt">${excerpt ? esc(excerpt) + '&hellip;' : ''}</p>
-        <div class="card-foot"><span class="read">Read story</span><span class="views"><b data-count="${views}">${views}</b> zobrazen&iacute; ${HEART}</span></div>
+        <div class="card-foot"><span class="read">Read story</span><span class="views"><b data-count="${views}">${views}</b> views ${HEART}</span></div>
       </div>
     </a>`;
   }
@@ -33,16 +33,16 @@
   /* Article = the poster zoomed in: viewfinder hero melting into the page,
      mono EXIF slate, drop-cap prose, camera-slate footer, related frames. */
   function postArticle(p, related) {
-    const rt = (p.read_time || '').trim();
+    const rt = String(p.read_time || '').replace(/Minut\s*čten[íi]\s*:\s*(\d+)/i, '$1 min read').trim();
     const views = parseInt(p.views, 10) || 0;
     const kicker = `<div class="post-kicker"><span class="k-name">&#9626; &Scaron;TEFAN &Scaron;RAGA</span><span class="tc" data-timer>00:00:00</span><span>${esc(p.date)}${rt ? ' &middot; ' + esc(rt) : ''}</span></div>`;
     const inner = `${kicker}<h1>${esc(p.title)} <span class="glitch">&#9646;&#9642;</span></h1>`;
     const hero = p.cover
       ? `<header class="post-hero"><div class="post-hero-media"><img src="${esc(p.cover)}" alt="${esc(p.title)}"></div><span class="crop-tr"></span><span class="crop-bl"></span><div class="post-hero-inner">${inner}</div></header>`
       : `<header class="post-hero post-hero--nocover"><span class="crop-tr"></span><span class="crop-bl"></span><div class="post-hero-inner">${inner}</div></header>`;
-    const exif = `<div class="post-exif"><span>SHOT <b>${esc(p.date)}</b></span>${rt ? `<span>&middot; ${esc(rt)}</span>` : ''}<span>&middot; <span class="views-dot">&#9679;</span> <b data-count="${views}">${views}</b> ZOBRAZEN&Iacute;</span><span>&middot; /${esc(p.slug)}</span></div>`;
+    const exif = `<div class="post-exif"><span>SHOT <b>${esc(p.date)}</b></span>${rt ? `<span>&middot; ${esc(rt)}</span>` : ''}<span>&middot; <span class="views-dot">&#9679;</span> <b data-count="${views}">${views}</b> VIEWS</span><span>&middot; /${esc(p.slug)}</span></div>`;
     const relStrip = (related && related.length)
-      ? `<aside class="recent-posts"><div class="rp-head"><strong>Nejnov&#283;j&scaron;&iacute; p&#345;&iacute;sp&#283;vky</strong> <a href="/blogs/">Zobrazit v&scaron;e</a></div><div class="rp-grid">${related.map(o =>
+      ? `<aside class="recent-posts"><div class="rp-head"><strong>Latest posts</strong> <a href="/blogs/">View all</a></div><div class="rp-grid">${related.map(o =>
           `<a class="rp-card" href="/post/${encodeURI(o.slug)}/"><img src="${esc(o.cover)}" alt="${esc(o.title)}" loading="lazy"><span class="rp-title">${esc(o.title)}</span></a>`).join('')}</div></aside>`
       : '';
     return `<article>
@@ -53,7 +53,7 @@
         <a class="back-to-blog" href="/blogs/">&#9664; Back to blog</a>
       </div>
       <div class="frame-out">&#8976; FRAME OUT &#172;</div>
-      <div class="post-foot"><span><span class="views-dot">&#9679;</span> <b data-count="${views}">${views}</b> zobrazen&iacute;</span><span>© Štefan Šraga</span></div>
+      <div class="post-foot"><span><span class="views-dot">&#9679;</span> <b data-count="${views}">${views}</b> views</span><span>© Štefan Šraga</span></div>
     </article>${relStrip}`;
   }
 

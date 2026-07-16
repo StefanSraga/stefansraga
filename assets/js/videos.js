@@ -20,7 +20,7 @@
   const emptyEl = root.querySelector('.vid-empty');
   const pagerEl = document.createElement('nav');
   pagerEl.className = 'vid-pager';
-  pagerEl.setAttribute('aria-label', 'Stránkování videí');
+  pagerEl.setAttribute('aria-label', 'Video pagination');
   if (emptyEl && emptyEl.parentNode) emptyEl.parentNode.insertBefore(pagerEl, emptyEl.nextSibling);
   else root.appendChild(pagerEl);
 
@@ -107,7 +107,7 @@
       const draw = () => {
         stage.innerHTML = `<div class="vm-gallery">
           <img src="${imgs[idx]}" alt="${esc(v.title)}">
-          ${imgs.length > 1 ? `<button class="vm-gnav vm-gprev" aria-label="Předchozí">&#8249;</button><button class="vm-gnav vm-gnext" aria-label="Další">&#8250;</button><span class="vm-gcount">${idx + 1} / ${imgs.length}</span>` : ''}
+          ${imgs.length > 1 ? `<button class="vm-gnav vm-gprev" aria-label="Previous">&#8249;</button><button class="vm-gnav vm-gnext" aria-label="Next">&#8250;</button><span class="vm-gcount">${idx + 1} / ${imgs.length}</span>` : ''}
         </div>`;
         const p = stage.querySelector('.vm-gprev'), n = stage.querySelector('.vm-gnext');
         if (p) p.onclick = e => { e.stopPropagation(); idx = (idx - 1 + imgs.length) % imgs.length; draw(); };
@@ -188,9 +188,9 @@
   // page navigation — appears only once the list overflows one page
   function renderPager(pageCount) {
     if (pageCount <= 1) { pagerEl.innerHTML = ''; return; }
-    let html = `<button class="vp-btn vp-arrow" data-go="prev"${page === 1 ? ' disabled' : ''} aria-label="Předchozí">&#8249;</button>`;
+    let html = `<button class="vp-btn vp-arrow" data-go="prev"${page === 1 ? ' disabled' : ''} aria-label="Previous">&#8249;</button>`;
     for (let i = 1; i <= pageCount; i++) html += `<button class="vp-btn vp-num${i === page ? ' active' : ''}" data-go="${i}">${i}</button>`;
-    html += `<button class="vp-btn vp-arrow" data-go="next"${page === pageCount ? ' disabled' : ''} aria-label="Další">&#8250;</button>`;
+    html += `<button class="vp-btn vp-arrow" data-go="next"${page === pageCount ? ' disabled' : ''} aria-label="Next">&#8250;</button>`;
     pagerEl.innerHTML = html;
     pagerEl.querySelectorAll('.vp-btn').forEach(b => b.addEventListener('click', () => {
       const g = b.getAttribute('data-go');

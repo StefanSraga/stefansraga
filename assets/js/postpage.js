@@ -58,7 +58,7 @@
     // draft preview (only a logged-in admin can ever receive an unpublished post)
     if (!p.published) {
       main.insertAdjacentHTML('afterbegin',
-        '<div class="draft-banner mono">N&Aacute;HLED KONCEPTU &mdash; &#269;l&aacute;nek nen&iacute; zve&#345;ejn&#283;n&yacute;. Vid&iacute;&scaron; ho jen ty (p&#345;ihl&aacute;&scaron;en&yacute; admin).</div>');
+        '<div class="draft-banner mono">DRAFT PREVIEW &mdash; this article is not published. Only you can see it (signed-in admin).</div>');
     }
 
     if (window.SRHud) window.SRHud(main);      // start timecode + view count-up on injected nodes
