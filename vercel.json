@@ -1,56 +1,121 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "node build/generate-site.js",
+  "buildCommand": "node build/fetch-seo.js && node build/generate-site.js",
   "outputDirectory": ".",
   "installCommand": "echo no-deps",
   "cleanUrls": true,
   "trailingSlash": true,
   "redirects": [
-    { "source": "/blog", "destination": "/blogs/", "permanent": true },
-    { "source": "/blog/", "destination": "/blogs/", "permanent": true },
-    { "source": "/blank", "destination": "/rallypraguerevival/", "permanent": true },
-    { "source": "/blank/", "destination": "/rallypraguerevival/", "permanent": true },
-    { "source": "/photos/football/", "destination": "/football/", "permanent": true },
-    { "source": "/photos/icehockey/", "destination": "/icehockey/", "permanent": true },
-    { "source": "/photos/events/", "destination": "/events/", "permanent": true },
-    { "source": "/photos/cars/", "destination": "/cars/", "permanent": true },
-    { "source": "/photos/rallypraguerevival/", "destination": "/rallypraguerevival/", "permanent": true },
-    { "source": "/photos/urbex/", "destination": "/urbex/", "permanent": true },
-    { "source": "/photos/comicconprague/", "destination": "/comicconprague/", "permanent": true }
+    {
+      "source": "/blog",
+      "destination": "/blogs/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "/blogs/",
+      "permanent": true
+    },
+    {
+      "source": "/blank",
+      "destination": "/rallypraguerevival/",
+      "permanent": true
+    },
+    {
+      "source": "/blank/",
+      "destination": "/rallypraguerevival/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/football/",
+      "destination": "/football/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/icehockey/",
+      "destination": "/icehockey/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/events/",
+      "destination": "/events/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/cars/",
+      "destination": "/cars/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/rallypraguerevival/",
+      "destination": "/rallypraguerevival/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/urbex/",
+      "destination": "/urbex/",
+      "permanent": true
+    },
+    {
+      "source": "/photos/comicconprague/",
+      "destination": "/comicconprague/",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/post/:slug", "destination": "/post/view" },
-    { "source": "/photos/:slug", "destination": "/photos/view" }
+    {
+      "source": "/post/:slug",
+      "destination": "/post/view"
+    },
+    {
+      "source": "/photos/:slug",
+      "destination": "/photos/view"
+    }
   ],
   "headers": [
     {
       "source": "/((?!assets/).*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
       "source": "/admin/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     },
     {
       "source": "/post/view/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
       ]
     },
     {
       "source": "/photos/view/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex"
+        }
       ]
     },
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]
