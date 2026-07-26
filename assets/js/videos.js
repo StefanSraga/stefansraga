@@ -37,16 +37,26 @@
     if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;      // a bare id
     return null;
   }
+  // Photo list of an entry. Accepts every shape the data can arrive in:
+  // a plain array of paths (static JSON), a jsonb array of {url} rows or of
+  // strings (Supabase "images" column), or a JSON string. Anything else → [].
+  function imagesOf(v) {
+    let a = v && v.images;
+    if (typeof a === 'string') { try { a = JSON.parse(a); } catch (e) { return []; } }
+    if (!Array.isArray(a)) return [];
+    return a.map(x => (typeof x === 'string' ? x : (x && (x.url || x.src)) || '')).filter(Boolean);
+  }
   function kind(v) {
     if (v.video) return youtubeId(v.video) ? 'youtube' : 'file';
-    if (v.images && v.images.length) return 'gallery';   // photo-only entry (e.g. a collab)
+    if (imagesOf(v).length) return 'gallery';   // photo-only entry (e.g. a collab)
     return 'soon';
   }
   function posterFor(v) {
     if (v.poster) return asset(v.poster);
     const id = youtubeId(v.video);
     if (id) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;  // automatic YouTube thumbnail
-    if (v.images && v.images.length) return asset(v.images[0]);
+    const imgs = imagesOf(v);
+    if (imgs.length) return asset(imgs[0]);
     return '';
   }
 
@@ -103,7 +113,7 @@
       stage.innerHTML = `<video poster="${posterFor(v)}" controls autoplay playsinline class="${v.orientation === 'portrait' ? 'portrait' : ''}">${srcs}</video>`;
     } else if (k === 'gallery') {
       let idx = 0;
-      const imgs = v.images.map(asset);
+      const imgs = imagesOf(v).map(asset);
       const draw = () => {
         stage.innerHTML = `<div class="vm-gallery">
           <img src="${imgs[idx]}" alt="${esc(v.title)}">
@@ -144,10 +154,16 @@
   }
 
   function cardHTML(v, i) {
-    const soon = kind(v) === 'soon';
+    const k = kind(v);
+    const soon = k === 'soon';
+    const nPhotos = k === 'gallery' ? imagesOf(v).length : 0;
+    // a photo-only entry gets a photo-stack icon + shot count; a play triangle
+    // there would promise a video that never plays
     const overlay = soon
       ? '<span class="vid-soon">Coming soon</span>'
-      : '<span class="vid-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>';
+      : k === 'gallery'
+        ? '<span class="vid-play is-photos" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 4H8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm-8.5 11l2.25-3 1.75 2.25 2.5-3.25L21 15h-9.5zM4 8H2v12a2 2 0 0 0 2 2h12v-2H4V8z"/></svg></span>'
+        : '<span class="vid-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>';
     const poster = posterFor(v);
     return `
       <article class="vid-card${soon ? ' is-soon' : ''}" data-i="${i}" style="--d:${(i % 8) * 60}ms">
@@ -155,6 +171,7 @@
           ${poster ? `<img src="${poster}" alt="${esc(v.title)}" loading="lazy">` : ''}
           ${overlay}
           <span class="vid-tag">${esc(catLabel(v.category))}</span>
+          ${nPhotos ? `<span class="vid-nphotos">${nPhotos} photo${nPhotos > 1 ? 's' : ''}</span>` : ''}
         </div>
         <div class="vid-info">
           <h3>${esc(v.title)}</h3>
@@ -220,15 +237,21 @@
       });
   }
 
-  // The Supabase videos table can't store multi-image galleries, so fold any
-  // static "images" entries (e.g. the VlaďkySyn collab) into the live list too.
+  // Safety net for photo-only entries: the DB now carries them in videos.images,
+  // but until that row exists the static JSON keeps the entry on the page.
+  // Matching on title as well as id is what stops it showing twice once the
+  // same entry has been created in the backend (the DB row gets a fresh uuid).
   function withStaticGalleries(categories, videos) {
     return fetch(FEED, { cache: 'no-cache' })
       .then(r => (r.ok ? r.json() : null))
       .then(j => {
         if (j && Array.isArray(j.videos)) {
+          const key = s => String(s || '').trim().toLowerCase();
           const have = new Set(videos.map(v => v.id));
-          j.videos.filter(v => v.images && v.images.length && !have.has(v.id)).forEach(v => videos.push(v));
+          const titles = new Set(videos.map(v => key(v.title)));
+          j.videos
+            .filter(v => imagesOf(v).length && !have.has(v.id) && !titles.has(key(v.title)))
+            .forEach(v => videos.push(v));
         }
         return { categories, videos };
       })

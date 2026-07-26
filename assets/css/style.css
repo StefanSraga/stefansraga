@@ -1295,6 +1295,24 @@ article .prose img.tall {
   padding: 8px 18px;
   background: rgba(0, 0, 0, 0.5);
 }
+/* photo-only entry: the badge holds a photo-stack icon, not a play triangle
+   (the triangle promised a video that never plays), plus a shot count */
+.vid-play.is-photos svg { margin-left: 0; }
+.vid-nphotos {
+  position: absolute;
+  bottom: 12px; right: 12px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 5px;
+  padding: 3px 9px;
+}
+
 .vid-tag {
   position: absolute;
   top: 12px; left: 12px;
@@ -1368,8 +1386,13 @@ article .prose img.tall {
 .vid-modal .vm-close:hover { color: var(--accent); }
 
 /* photo-gallery view inside the modal (image-only entries, e.g. VlaďkySyn) */
-.vid-modal .vm-gallery { position: relative; width: 100%; text-align: center; }
-.vid-modal .vm-gallery img { max-width: 100%; max-height: 84vh; border-radius: 10px; }
+/* flex-centred, NOT text-align: the <img> is display:block, so text-align
+   left it pinned to the left edge with the arrows stranded in empty black */
+.vid-modal .vm-gallery {
+  position: relative; width: 100%;
+  display: flex; align-items: center; justify-content: center;
+}
+.vid-modal .vm-gallery img { display: block; max-width: 100%; max-height: 84vh; border-radius: 10px; }
 .vid-modal .vm-gnav {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 46px; height: 46px; border-radius: 50%;

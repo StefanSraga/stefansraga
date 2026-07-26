@@ -207,8 +207,8 @@ function shell({ title, desc, prefix, body, extraCss = '', bodyClass = '', cms =
   <meta name="twitter:image" content="${ogImg}">
   <link rel="icon" type="image/png" href="${prefix}assets/img/${LOGO}">
   <link rel="preconnect" href="https://pvfzbgvhtlrapdujiert.supabase.co" crossorigin>
-  <link rel="stylesheet" href="${prefix}assets/css/fonts.css?v=45">
-  <link rel="stylesheet" href="${prefix}assets/css/style.css?v=45">${extraCss ? `\n  <style>${extraCss}</style>` : ''}${ldBlocks ? `\n  ${ldBlocks}` : ''}
+  <link rel="stylesheet" href="${prefix}assets/css/fonts.css?v=46">
+  <link rel="stylesheet" href="${prefix}assets/css/style.css?v=46">${extraCss ? `\n  <style>${extraCss}</style>` : ''}${ldBlocks ? `\n  ${ldBlocks}` : ''}
 </head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>
 
@@ -266,8 +266,8 @@ ${body}
   </div>
 </footer>
 
-<script src="${prefix}assets/js/main.js?v=45"></script>
-<script src="${prefix}assets/js/consent.js?v=45" defer></script>${cms ? cmsBase(prefix) : ''}
+<script src="${prefix}assets/js/main.js?v=46"></script>
+<script src="${prefix}assets/js/consent.js?v=46" defer></script>${cms ? cmsBase(prefix) : ''}
 </body>
 </html>
 `;
@@ -287,20 +287,20 @@ function titleBar(name, cmsKey) {
 function cmsScripts(P, hydrator) {
   return `
   <script src="${P}assets/js/vendor/supabase.js"></script>
-  <script src="${P}assets/js/config.js?v=45"></script>
-  <script src="${P}assets/js/cms.js?v=45"></script>
-  <script src="${P}assets/js/render.js?v=45"></script>
-  <script src="${P}assets/js/${hydrator}?v=45"></script>
-  <script src="${P}assets/js/site.js?v=45"></script>`;
+  <script src="${P}assets/js/config.js?v=46"></script>
+  <script src="${P}assets/js/cms.js?v=46"></script>
+  <script src="${P}assets/js/render.js?v=46"></script>
+  <script src="${P}assets/js/${hydrator}?v=46"></script>
+  <script src="${P}assets/js/site.js?v=46"></script>`;
 }
 // Base CMS stack for pages WITHOUT a data hydrator (marketing/about/legal) —
 // still lets site.js hydrate editable texts + the footer.
 function cmsBase(P) {
   return `
   <script src="${P}assets/js/vendor/supabase.js"></script>
-  <script src="${P}assets/js/config.js?v=45"></script>
-  <script src="${P}assets/js/cms.js?v=45"></script>
-  <script src="${P}assets/js/site.js?v=45"></script>`;
+  <script src="${P}assets/js/config.js?v=46"></script>
+  <script src="${P}assets/js/cms.js?v=46"></script>
+  <script src="${P}assets/js/site.js?v=46"></script>`;
 }
 
 function redirect(rel, target) {
@@ -886,10 +886,10 @@ ${rows}
     <p class="vid-empty" hidden>Loading videos&hellip;</p>
   </div>
   <script src="${P}assets/js/vendor/supabase.js"></script>
-  <script src="${P}assets/js/config.js?v=45"></script>
-  <script src="${P}assets/js/cms.js?v=45"></script>
-  <script src="${P}assets/js/videos.js?v=45"></script>
-  <script src="${P}assets/js/site.js?v=45"></script>`;
+  <script src="${P}assets/js/config.js?v=46"></script>
+  <script src="${P}assets/js/cms.js?v=46"></script>
+  <script src="${P}assets/js/videos.js?v=46"></script>
+  <script src="${P}assets/js/site.js?v=46"></script>`;
   const seo = SEO_PAGES['/videos/'] || {};
   smAdd('/videos/', { priority: 0.8, changefreq: 'weekly' });
   write('videos/index.html', shell({
