@@ -10,3 +10,6 @@ Thumbs.db
 # scratch
 *.log
 build/seo-overrides.json
+
+# tool scratch output
+.playwright-mcp/
