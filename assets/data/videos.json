@@ -187,20 +187,6 @@
       "date": "2025",
       "description": "Another video for the STRONGBOLD H800 Superhorse (1 pair) — featuring its next-generation telescopic design, high-grade steel construction, and impressive 1,180 kg load capacity.",
       "video": "https://www.youtube.com/watch?v=Hjy3RObUdpg"
-    },
-    {
-      "id": "vladkysyn-collaboration",
-      "title": "VlaďkySyn",
-      "category": "promo",
-      "date": "2025",
-      "description": "Long-term collaboration with VlaďkySyn — a set of promo visuals from our shared shoots.",
-      "poster": "assets/img/491946_1befe98eb999420ebaa6c848508f806ef003.jpg",
-      "images": [
-        "assets/img/491946_1befe98eb999420ebaa6c848508f806ef003.jpg",
-        "assets/img/491946_255006e7f03f48f48e9a4cadfbdef2fcf003.jpg",
-        "assets/img/491946_12191d3418514f45af4c658d78af8e08f003.jpg",
-        "assets/img/491946_d81cea3784b440e699aabb041418e83cf003.jpg"
-      ]
     }
   ]
 }

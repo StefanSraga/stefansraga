@@ -39,19 +39,10 @@
     if (/^[A-Za-z0-9_-]{11}$/.test(String(v).trim())) return String(v).trim();
     return null;
   }
-  // photo-only entries: videos.images is a jsonb array of urls (tolerates the
-  // {url:…} row shape and a JSON string, so old data never breaks the panel)
-  function imagesOf(v) {
-    let a = v && v.images;
-    if (typeof a === 'string') { try { a = JSON.parse(a); } catch (e) { return []; } }
-    if (!Array.isArray(a)) return [];
-    return a.map(x => (typeof x === 'string' ? x : (x && (x.url || x.src)) || '')).filter(Boolean);
-  }
   function videoThumb(v) {
     if (v.poster) return v.poster;
     const id = youtubeId(v.video);
-    if (id) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-    return imagesOf(v)[0] || '';
+    return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
   }
 
   /* ---------- toast ---------- */
@@ -139,10 +130,6 @@
      VIDEOS
      ============================================================ */
   let CATS = [];
-  // Does videos.images exist yet? select('*') puts the key on every row when it
-  // does. Without this probe an older database would reject every save with
-  // "column images does not exist" and the client could not add videos at all.
-  let IMAGES_OK = false;
   async function loadVideosPanel() {
     const panel = $('[data-panel="videos"]');
     panel.innerHTML = '<p class="empty-hint">Načítám…</p>';
@@ -151,7 +138,6 @@
       sb.from('videos').select('*').order('sort'),
     ]);
     CATS = cats || [];
-    IMAGES_OK = !!(vids && vids[0] && Object.prototype.hasOwnProperty.call(vids[0], 'images'));
     panel.innerHTML = '';
 
     // categories bar
@@ -221,14 +207,13 @@
       guardCall(sb.from('videos').update({ published: e.target.checked }).eq('id', v.id), 'Uloženo');
     const [edit, del] = row.querySelectorAll('.r-actions .btn');
     edit.onclick = () => editVideo(v);
-    del.onclick = async () => { if (confirm(`Smazat video „${v.title}"?`)) { await guardCall(sb.from('videos').delete().eq('id', v.id), 'Smazáno'); removeMedia([v.poster, ...imagesOf(v)]); loadVideosPanel(); } };
+    del.onclick = async () => { if (confirm(`Smazat video „${v.title}"?`)) { await guardCall(sb.from('videos').delete().eq('id', v.id), 'Smazáno'); removeMedia([v.poster]); loadVideosPanel(); } };
     return row;
   }
 
   function editVideo(v) {
     const isNew = !v;
-    v = v || { title: '', category: (CATS[0] || {}).id || '', description: '', video: '', poster: '', orientation: 'landscape', images: [], published: true };
-    const vImgs = imagesOf(v);   // live working copy; written back into the row on save
+    v = v || { title: '', category: (CATS[0] || {}).id || '', description: '', video: '', poster: '', orientation: 'landscape', published: true };
     const opts = CATS.map(c => `<option value="${esc(c.id)}" ${c.id === v.category ? 'selected' : ''}>${esc(c.label)}</option>`).join('');
     const orient = o => `<option value="${o}" ${(v.orientation || 'landscape') === o ? 'selected' : ''}>`;
     openDialog(isNew ? 'Nové video' : 'Upravit video', `
@@ -254,11 +239,6 @@
       <div class="field"><label>Orientace</label>
         <select id="f-orient">${orient('landscape')}na šířku (16:9)</option>${orient('portrait')}na výšku (reel)</option></select>
       </div>
-      ${IMAGES_OK ? `<div class="field"><label>Fotky místo videa (${vImgs.length})</label>
-        <input type="file" id="f-vimgs-file" accept="image/*" multiple style="font-size:13px">
-        <span class="hint">Nech <b>YouTube odkaz prázdný</b> a nahraj sem fotky — položka se na webu bude chovat jako fotogalerie (po kliknutí se fotky prolistují). Když je vyplněné video, fotky se nepoužijí.</span>
-        <div class="imgs-grid" id="f-vimgs"></div>
-      </div>` : ''}
       <div class="field"><label>Popis</label><textarea id="f-desc">${esc(v.description)}</textarea></div>
     `, async () => {
       let poster = v.poster || '';
@@ -273,7 +253,6 @@
         description: val('f-desc'),
         published: checked('f-pub'),
       };
-      if (IMAGES_OK) rec.images = vImgs;
       if (!rec.title) { toast('Vyplň název', true); throw new Error('no title'); }
       if (isNew) {
         const { data: mx } = await sb.from('videos').select('sort').order('sort', { ascending: false }).limit(1);
@@ -294,50 +273,6 @@
       };
       const pf = document.getElementById('f-vposter-file');
       if (pf) pf.onchange = () => { if (pf.files[0]) document.getElementById('f-vposter-prev').src = URL.createObjectURL(pf.files[0]); };
-
-      // ---- photo manager (photo-only entries) ----
-      const grid = document.getElementById('f-vimgs');
-      if (!grid) return;
-      // an existing row is written straight through, so photos survive even if
-      // the dialog is closed without pressing Save; a new row saves on insert
-      const persist = () => ((isNew || !IMAGES_OK) ? Promise.resolve()
-        : sb.from('videos').update({ images: vImgs }).eq('id', v.id));
-      const renderImgs = () => {
-        grid.innerHTML = '';
-        vImgs.forEach((url, idx) => {
-          const cell = el('div', 'img-cell', `<img src="${esc(url)}" alt="">
-            <button class="x" title="Smazat">&times;</button>
-            <div class="mv"><button class="l" ${idx === 0 ? 'disabled' : ''}>◀</button><button class="r" ${idx === vImgs.length - 1 ? 'disabled' : ''}>▶</button></div>`);
-          cell.querySelector('.x').onclick = async () => {
-            vImgs.splice(idx, 1); renderImgs();
-            await persist(); removeMedia([url]); toast('Fotka smazána');
-          };
-          cell.querySelector('.mv .l').onclick = () => swapImg(idx, idx - 1);
-          cell.querySelector('.mv .r').onclick = () => swapImg(idx, idx + 1);
-          grid.appendChild(cell);
-        });
-      };
-      async function swapImg(a, b) {
-        if (b < 0 || b >= vImgs.length) return;
-        const t = vImgs[a]; vImgs[a] = vImgs[b]; vImgs[b] = t;
-        renderImgs(); await persist();
-      }
-      renderImgs();
-      const fin = document.getElementById('f-vimgs-file');
-      fin.onchange = async () => {
-        const files = [...fin.files];
-        if (!files.length) return;
-        fin.disabled = true;
-        let ok = 0;
-        for (let i = 0; i < files.length; i++) {
-          toast(`Nahrávám ${i + 1}/${files.length}…`);
-          try { vImgs.push(await uploadImage(files[i], 'videos')); ok++; renderImgs(); }
-          catch (e) { toast(e.message, true); }
-        }
-        await persist();
-        fin.disabled = false; fin.value = '';
-        toast(`Hotovo — nahráno ${ok} z ${files.length} fotek`);
-      };
     }, 0);
   }
 

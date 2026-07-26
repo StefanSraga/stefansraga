@@ -33,14 +33,11 @@ create table if not exists public.videos (
   video        text default '',           -- YouTube link (or an mp4 path, or "" = coming soon)
   poster       text,                       -- optional; auto-derived from YouTube when null
   orientation  text not null default 'landscape',  -- 'landscape' | 'portrait'
-  images       jsonb not null default '[]'::jsonb,  -- photo-only entry: [] = normal video
   sort         int  not null default 0,
   published    boolean not null default true,
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
 );
--- existing databases: add the photo list without touching anything else
-alter table public.videos add column if not exists images jsonb not null default '[]'::jsonb;
 
 -- blog posts
 create table if not exists public.posts (
